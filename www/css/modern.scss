@@ -1,0 +1,4 @@
+/* use this instead of display:grid because of Edge - thank you, Microsoft*/
+@supports (grid-area: auto) {
+
+}

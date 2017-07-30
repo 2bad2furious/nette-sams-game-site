@@ -1,0 +1,49 @@
+header {
+  background: $background-color1;
+  padding: 15px;
+
+  display: flex;
+  border-bottom: 1px solid $background-color2;
+  a#go_home {
+    position: absolute;
+    top: 10px;
+
+    &:hover {
+      #logo {
+        height: 55px;
+        margin: 0;
+      }
+    }
+    #logo {
+      height: 50px;
+      margin: 2.5px;
+      width: auto;
+      border: 0;
+    }
+  }
+
+  div#header-right-container {
+    margin-left: auto;
+    padding: 0.5px;
+
+    a#add-new-map {
+      font-size: 2rem;
+      padding: 0rem 0.3rem 0.0625rem;
+      text-decoration: none;
+    }
+
+    a {
+      font-size: 1.2rem;
+      color: $background-color2;
+    }
+
+    a {
+      padding: 0.6rem;
+      transition: all 0.2s ease-in-out;
+      border: 2px solid transparent;
+      &:hover, &.active {
+        border-color: $background-color2;
+      }
+    }
+  }
+}

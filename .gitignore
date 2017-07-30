@@ -2,7 +2,10 @@ composer.phar
 /vendor/
 .idea/
 sam.zip
-
+temp
+log
+config/config.local.neon
+config/config.product.neon
 # Commit your application's lock file http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file
 # You may choose to ignore a library lock file http://getcomposer.org/doc/02-libraries.md#lock-file
 # composer.lock

@@ -1,0 +1,104 @@
+@import url("https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i,800,800i&subset=cyrillic,cyrillic-ext,latin-ext");
+html, body, a {
+  padding: 0;
+  margin: 0; }
+
+html {
+  font-size: 16px; }
+
+* {
+  box-sizing: border-box;
+  font-family: "Open Sans", sans-serif;
+  line-height: 1.5rem;
+  vertical-align: middle; }
+
+h1 {
+  font-size: 2rem; }
+
+h2 {
+  font-size: 1.6rem; }
+
+h3 {
+  font-size: 1.3rem; }
+
+header {
+  background: white;
+  padding: 15px;
+  display: flex;
+  border-bottom: 1px solid black; }
+  header a#go_home {
+    position: absolute;
+    top: 10px; }
+    header a#go_home:hover #logo {
+      height: 55px;
+      margin: 0; }
+    header a#go_home #logo {
+      height: 50px;
+      margin: 2.5px;
+      width: auto;
+      border: 0; }
+  header div#header-right-container {
+    margin-left: auto;
+    padding: 0.5px; }
+    header div#header-right-container a#add-new-map {
+      font-size: 2rem;
+      padding: 0rem 0.3rem 0.0625rem;
+      text-decoration: none; }
+    header div#header-right-container a {
+      font-size: 1.2rem;
+      color: black; }
+    header div#header-right-container a {
+      padding: 0.6rem;
+      transition: all 0.2s ease-in-out;
+      border: 2px solid transparent; }
+      header div#header-right-container a:hover, header div#header-right-container a.active {
+        border-color: black; }
+
+footer {
+  padding: 5px;
+  border-top: 1px solid black; }
+  footer div {
+    display: block;
+    text-align: center; }
+
+/* use this instead of display:grid because of Edge - thank you, Microsoft*/
+/* some stuff comes from https://github.com/engageinteractive/core/blob/master/src/scss/utility/_mixins.scss */
+a {
+  cursor: pointer; }
+  a.disabled {
+    cursor: default; }
+
+body {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+  justify-content: space-between;
+  color: black; }
+  body #content {
+    width: 70%;
+    margin: auto;
+    padding: 20px;
+    min-height: calc(100vh - 150px); }
+  body form input, body form textarea {
+    padding: 6px;
+    border: solid 1px black;
+    background: white;
+    transition: all 0.2s ease-in-out;
+    box-shadow: black 1px;
+    margin: 2px;
+    font-size: 1rem; }
+    body form input:hover, body form textarea:hover {
+      /*border-color: $background-color1;
+      */
+      padding: 8px;
+      margin: 0px; }
+  body form label {
+    font-size: 1rem; }
+
+@supports (flex-grow: 10) or (-webkit-flex-grow: 10) {
+  #content {
+    flex-grow: 1000;
+    -webkit-flex-grow: 1000;
+    min-height: 0; } }
+
+/*# sourceMappingURL=site.css.map */

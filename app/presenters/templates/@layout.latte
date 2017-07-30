@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>{ifset $title}{$title|trim} | {/ifset}XD</title>
+    <link rel="stylesheet" media="screen" href="/css/site.css" type="text/css"/>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"
+            integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+            crossorigin="anonymous" type="application/javascript"></script>
+    <script src="/js/functions.js" type="application/javascript"></script>
+    <script src="/js/js.js" type="application/javascript"></script>
+    <script src="https://nette.github.io/resources/js/netteForms.js"type="application/javascript"></script>
+    <script src="/ext/nette.ajax.js" type="application/javascript"></script>
+</head>
+<body>
+{control header}
+<div id="content">
+    {include content}
+</div>
+<div>
+    {foreach $flashes as $flash}
+        <div class="flash {$flash->type}">{_}{$flash->message}{/_}</div>
+    {/foreach}
+</div>
+<footer>
+    <div>
+        © {php echo date('Y')} - Martin Macura, proudly powered by Nette
+    </div>
+</footer>
+</body>
+</html>

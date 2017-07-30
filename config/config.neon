@@ -1,0 +1,11 @@
+session:
+    autoStart: smart
+    cookieParth: '/'
+    expiration: 10 days
+
+
+services:
+    routerFactory: Router
+    router: @routerFactory::createRouter
+    authenticator: UserManager
+    identity: UserIdentity

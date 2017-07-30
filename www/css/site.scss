@@ -1,0 +1,63 @@
+$background-color1: white;
+$background-color2: black;
+
+@import "functions";
+@import "reset";
+@import "header";
+@import "footer";
+@import "modern";
+@import "responsive";
+
+/* some stuff comes from https://github.com/engageinteractive/core/blob/master/src/scss/utility/_mixins.scss */
+a {
+  cursor: pointer;
+  &.disabled {
+    cursor: default;
+  }
+}
+
+body {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+  justify-content: space-between;
+  color: $background-color2;
+
+  #content {
+    width: 70%;
+    margin: auto;
+    padding: 20px;
+    min-height: calc(100vh - 150px);
+  }
+
+  form {
+    input, textarea {
+      $padding: 6px;
+      $margin: 2px;
+      padding: $padding;
+      border: solid 1px $background-color2;
+      background: $background-color1;
+      transition: all 0.2s ease-in-out;
+      box-shadow: $background-color2 1px;
+      margin: $margin;
+      font-size: 1rem;
+      &:hover {
+        /*border-color: $background-color1;
+        */
+        padding: $padding + $margin;
+        margin: 0px;
+      }
+    }
+    label {
+      font-size: 1rem;
+    }
+  }
+}
+
+@supports (flex-grow: 10) or (-webkit-flex-grow: 10) {
+  #content {
+    flex-grow: 1000;
+    -webkit-flex-grow: 1000;
+    min-height: 0;
+  }
+}
