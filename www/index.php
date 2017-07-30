@@ -41,6 +41,10 @@ require_once __DIR__ . "/../vendor/autoload.php";
 // Configure application
 $configurator = new Nette\Configurator;
 
+$configurator->setDebugMode("192.168.1.54");
+
+// prod mode => $configurator->setDebugMode(false);
+
 // Enable Tracy for error visualisation & logging
 $configurator->enableTracy(__DIR__ . '/../log');
 
@@ -58,9 +62,10 @@ $container = $configurator->createContainer();
 
 $connection = getConnection($container);
 $connection->beginTransaction();
+
 try {
-    $container->getByType(Nette\Application\Application::class)
-        ->run();
+    $app = $container->getByType(Nette\Application\Application::class);
+    $app->run();
 
     $connection->commit();
 } catch (Exception $ex) {
