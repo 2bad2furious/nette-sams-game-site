@@ -1,0 +1,1 @@
+# nette-sams-game-site
