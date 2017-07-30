@@ -6,20 +6,26 @@ class UserIdentity implements \Nette\Security\IIdentity {
     private $id;
     private $username;
     private $email;
-    private $roles = [];
+    private $role;
+    private $admin;
+    private $description;
 
     /**
      * UserIdentity constructor.
      * @param int $id
      * @param string $username
      * @param string $email
-     * @param array $roles
+     * @param string $description
+     * @param int $role
+     * @param bool $admin
      */
-    public function __construct(int $id = -1, string $username = "no-name", string $email = "no-email", array $roles = []) {
+    public function __construct(int $id, string $username, string $email, string $description, int $role, bool $admin) {
         $this->id = $id;
         $this->username = $username;
         $this->email = $email;
-        $this->roles = $roles;
+        $this->role = $role;
+        $this->admin = $admin;
+        $this->description = $description;
     }
 
 
@@ -44,10 +50,25 @@ class UserIdentity implements \Nette\Security\IIdentity {
         return $this->email;
     }
 
+    function getRole(): int {
+        return $this->role;
+    }
+
     /**
-     * @return array
-     **/
-    function getRoles() {
-        return $this->roles;
+     * @return bool
+     */
+    public function isAdmin(): bool {
+        return $this->admin;
+    }
+
+    function getRoles(): array {
+        return [$this->getRole()];
+    }
+
+    /**
+     * @return string
+     */
+    public function getDescription(): string {
+        return $this->description;
     }
 }

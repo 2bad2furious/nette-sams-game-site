@@ -7,28 +7,28 @@ class UserManager implements \Nette\Security\IAuthenticator, \Nette\Security\IAu
     private $database;
 
     //t1 column +table names
-    const USER_TABLE = "user",
-        USER_ID = "user_id",
+    const USER_TABLE = "user";
+    const USER_ID = "user_id",
         NICKNAME = "username",
         EMAIL = "email",
-        PW = "password";
+        PW = "password",
+        DESCRIPTION = "description",
+        ROLE = "role",
+        ADMIN = "admin";
 
-    //t2 column + table names
-    const ROLE_TABLE = "user_role",
-        ROLE_ID = "role_id",
-        USER_ROLE_ID = "user_role_id";
+    const COLUMNS = [self::USER_ID, self::NICKNAME, self::EMAIL, self::PW, self::DESCRIPTION, self::ROLE, self::ADMIN];
 
-
-    const ROLE_USER = 1,
+    const ROLE_GUEST = 0,
+        ROLE_USER = 1,
         ROLE_VERIFIED_USER = 2;
 
-    const ROLES = [self::ROLE_USER, self::ROLE_VERIFIED_USER];
+    const ROLES = [self::ROLE_GUEST, self::ROLE_USER, self::ROLE_VERIFIED_USER];
 
     const DEFAULT_ROLES = [self::ROLE_USER];
 
     /**
      * UserAuthenticator constructor.
-     * @param \Nette\Database\Connection $database
+     * @param \Nette\Database\Context $database
      */
     public function __construct(Nette\Database\Context $database) {
         $this->database = $database;
@@ -37,6 +37,7 @@ class UserManager implements \Nette\Security\IAuthenticator, \Nette\Security\IAu
     /**
      * Performs an authentication against e.g. database.
      * and returns IIdentity on success or throws AuthenticationException
+     * @param array $credentials
      * @return \Nette\Security\IIdentity
      * @throws \Nette\Security\AuthenticationException
      */
@@ -50,30 +51,38 @@ class UserManager implements \Nette\Security\IAuthenticator, \Nette\Security\IAu
 
         if (!$user || !Nette\Security\Passwords::verify($password, $user->{self::PW})) throw new \Nette\Security\AuthenticationException();
 
-        return new UserIdentity($user->{self::USER_ID}, $user->{self::NICKNAME}, $user->{self::EMAIL}, $this->getRoles($user->{self::USER_ID}));
+        return new UserIdentity($user->{self::USER_ID}, $user->{self::NICKNAME}, $user->{self::EMAIL}, $user->{self::DESCRIPTION}, $user->{self::ROLE}, $user->{self::ADMIN});
     }
 
-    public function register(string $username, string $email, string $password): bool {
+    public function register(string $username, string $email, string $password, int $role, bool $admin): bool {
+
         //do the next thing only if it is ok
-        $last_id = 0;
-        $result = $this->database->table(self::USER_TABLE)->insert([
+        $result = 0;
+        try {
+            $result = $this->database->table(self::USER_TABLE)->insert([
                 self::NICKNAME => $username,
                 self::PW       => Nette\Security\Passwords::hash($password),
                 self::EMAIL    => $email,
-            ])
-            && $last_id = $this->database->getInsertId()
-                && $this->insertDefaultRoles($last_id);
+                self::ROLE     => $role,
+                self::ADMIN    => $admin,
+
+            ]);
+        } catch (Exception $ex) {
+            $result = 0;
+        }
         if (!$result) $this->database->rollBack();
-        return $result;
+        return boolval($result);
     }
 
-    public function usernameExists(string $username): bool {
+    public
+    function usernameExists(string $username): bool {
         return boolval($this->database->table(self::USER_TABLE)->where([
             self::NICKNAME => $username,
         ])->fetch());
     }
 
-    public function emailExists(string $email): bool {
+    public
+    function emailExists(string $email): bool {
         return boolval($this->database->table(self::USER_TABLE)->where([
             self::EMAIL => $email,
         ])->fetch());
@@ -85,7 +94,8 @@ class UserManager implements \Nette\Security\IAuthenticator, \Nette\Security\IAu
      * @return bool
      * @throws Exception
      */
-    public function isPasswordOk($password, $useless = "") {
+    public
+    function isPasswordOk($password, $useless = "") {
         if ($password instanceof Nette\Forms\Controls\TextInput)
             $password = $password->getValue();
         else if (!is_string($password)) throw new Exception("Invalid parameter");
@@ -93,7 +103,8 @@ class UserManager implements \Nette\Security\IAuthenticator, \Nette\Security\IAu
         return preg_match("/[0-9](.)*[0-9]/", $password) && preg_match("/[a-z](.)*[a-z]/", $password) && preg_match("/[A-Z](.)*[A-Z]/", $password);
     }
 
-    public function isEmailOk(string $email): bool {
+    public
+    function isEmailOk(string $email): bool {
         try {
             $domain = explode("@", $email)[1];
             return filter_var($email, FILTER_VALIDATE_EMAIL) && checkdnsrr($domain, 'MX');
@@ -102,7 +113,8 @@ class UserManager implements \Nette\Security\IAuthenticator, \Nette\Security\IAu
         }
     }
 
-    public function isUsernameOk(string $username): bool {
+    public
+    function isUsernameOk(string $username): bool {
         return !preg_match("/[^0-9a-zA-Z-_+]/", $username);
     }
 
@@ -117,11 +129,13 @@ class UserManager implements \Nette\Security\IAuthenticator, \Nette\Security\IAu
         diedump($role, $resource, $privilege);
     }
 
-    public function getOneByName(string $username):?UserIdentity {
+    public
+    function getOneByName(string $username):?UserIdentity {
         return $this->getOneBy(self::NICKNAME, $username);
     }
 
-    public function changeUsername(int $id, string $username): bool {
+    public
+    function changeUsername(int $id, string $username): bool {
         $user = $this->getOneByName($username);
         if ($user instanceof UserIdentity && $user->getId() !== $id) throw new Exception("Username already taken");
         if (!$this->isUsernameOk($username)) throw new Exception("Username not ok");
@@ -134,51 +148,25 @@ class UserManager implements \Nette\Security\IAuthenticator, \Nette\Security\IAu
         ]));
     }
 
-    private function getOneById(int $id):?UserIdentity {
+    private
+    function getOneById(int $id):?UserIdentity {
         return $this->getOneBy(self::USER_TABLE . "." . self::USER_ID, $id);
     }
 
-    private function insertDefaultRoles(int $id): bool {
-        foreach (self::DEFAULT_ROLES as $role) {
-            $r = $this->database->table(self::ROLE_ID)
-                ->insert([
-                    self::USER_ID => $id,
-                    self::ROLE_ID => $role,
-                ]);
-            if (!$r) return false;
-        }
-        return true;
-    }
-
-    public function getOneBy(string $column, string $value):?UserIdentity {
+    public
+    function getOneBy(string $column, string $value):?UserIdentity {
+        if (!in_array($column, self::COLUMNS)) throw new Exception("column does not exist");
         $data = $this->database->table(self::USER_TABLE)->where([
             $column => $value,
         ])->fetch();
         if ($data) {
-            $roles = $this->getRoles($data->{self::USER_ID});
-            return new UserIdentity($data->{self::USER_ID}, $data{self::NICKNAME}, $data{self::EMAIL}, $roles);
+            return new UserIdentity($data->{self::USER_ID}, $data->{self::NICKNAME}, $data->{self::EMAIL}, $data->{self::DESCRIPTION}, $data->{self::ROLE}, $data->{self::ADMIN});
         }
         return null;
     }
 
-    private function getRoles(int $user_id): array {
-        $roles = [];
-        $data = $this->database->table(self::ROLE_TABLE)->where([
-            self::USER_ID => $user_id,
-        ])->fetchAll();
-
-        foreach ($data as $role) {
-            $role_num = $role->{self::ROLE_ID};
-            if (in_array($role_num, self::ROLES)) {
-                $roles[] = $role_num;
-            } else {
-                trigger_error("ROLE " . $role_num . " NOT FOUND IN ARRAY");
-            }
-        }
-        return $roles;
-    }
-
-    public function getOneByEmail(string $email):?UserIdentity {
+    public
+    function getOneByEmail(string $email):?UserIdentity {
         return $this->getOneBy(self::EMAIL, $email);
     }
 }

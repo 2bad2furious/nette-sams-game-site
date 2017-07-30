@@ -2,10 +2,9 @@ session:
     autoStart: smart
     cookieParth: '/'
     expiration: 10 days
-
+    identity: UserIdentity
 
 services:
     routerFactory: Router(%consoleMode%)
     router: @routerFactory::createRouter
     authenticator: UserManager
-    identity: UserIdentity
