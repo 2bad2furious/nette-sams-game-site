@@ -1,0 +1,18 @@
+@import "functions";
+@import "reset";
+
+header {
+  div#header-container {
+    //IE xd
+    height: auto;
+    height: initial;
+    text-align: right;
+
+    a {
+      display: initial;
+    }
+  }
+  span#header_menu_roll {
+    display: none;
+  }
+}
