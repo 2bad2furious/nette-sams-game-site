@@ -34,7 +34,7 @@ bindUsernameChecker = function () {
     console.info(username.length + " username")
     if (username.length && username.attr("id").split("logInForm").length === 1) {
         username.focusout(function () {
-            console.log(username.val()+" u val")
+            console.log(username.val() + " u val")
             checkAvailability("username", username.val())
         })
     }
@@ -45,8 +45,21 @@ bindEmailChecker = function () {
     console.info(email.length + " email")
     if (email.length) {
         email.focusout(function () {
-            console.log(email.val()+" e val");
+            console.log(email.val() + " e val");
             checkAvailability("email", email.val())
         })
+    }
+}
+
+toggleMenu = function () {
+    obj = $("div#header-container");
+    if (obj.length) {
+        if (obj.hasClass("active")) {
+
+            obj.removeClass("active");
+        } else {
+
+            obj.addClass("active");
+        }
     }
 }

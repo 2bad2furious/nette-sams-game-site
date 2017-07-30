@@ -65,6 +65,7 @@ $connection->beginTransaction();
 
 try {
     $app = $container->getByType(Nette\Application\Application::class);
+
     $app->run();
 
     $connection->commit();
