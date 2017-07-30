@@ -11,9 +11,10 @@ html {
 }
 
 * {
+  transition: all 0.3s linear;
   box-sizing: border-box;
   font-family: $fonts;
-  line-height: 1.5rem;
+  line-height: 1.7rem;
   vertical-align: middle;
 }
 
@@ -27,4 +28,12 @@ h2 {
 
 h3 {
   font-size: 1.3rem;
+}
+
+.clearfix {
+  &::after {
+    content: "";
+    clear: both;
+    display: table;
+  }
 }

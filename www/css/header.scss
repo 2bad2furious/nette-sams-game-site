@@ -2,48 +2,56 @@ header {
   background: $background-color1;
   padding: 15px;
 
-  display: flex;
+  display: block;
   border-bottom: 1px solid $background-color2;
-  a#go_home {
-    position: absolute;
-    top: 10px;
 
-    &:hover {
-      #logo {
-        height: 55px;
-        margin: 0;
-      }
-    }
-    #logo {
-      height: 50px;
-      margin: 2.5px;
+  max-height: 100vw;
+  overflow-y: auto;
+
+  color: $background-color2;
+
+  a#go_home {
+    float: left;
+    img#logo {
+      height: 70px;
       width: auto;
-      border: 0;
     }
   }
 
-  div#header-right-container {
-    margin-left: auto;
-    padding: 0.5px;
+  span#header_menu_roll {
+    float: right;
+    color: $background-color2;
+    text-decoration: none;
+    font-size: 70px;
+    cursor: pointer;
 
-    a#add-new-map {
-      font-size: 2rem;
-      padding: 0rem 0.3rem 0.0625rem;
+    &:hover, &:active {
+      color: red;
+    }
+  }
+
+  div#header-container {
+    overflow: hidden;
+    position: relative;
+    top: -500px;
+    vertical-align: middle;
+    padding: 1px;
+    font-size: 1rem;
+    text-align: center;
+
+    transition: all 1.3s linear;
+    &.active {
+      //IE
+      top: 0;
+    }
+
+    a {
+      color: black;
+      font-size: 1.5rem;
+
       text-decoration: none;
-    }
 
-    a {
-      font-size: 1.2rem;
-      color: $background-color2;
-    }
-
-    a {
-      padding: 0.6rem;
-      transition: all 0.2s ease-in-out;
-      border: 2px solid transparent;
-      &:hover, &.active {
-        border-color: $background-color2;
-      }
+      display: block;
     }
   }
 }
