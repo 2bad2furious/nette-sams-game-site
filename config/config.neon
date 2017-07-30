@@ -5,7 +5,7 @@ session:
 
 
 services:
-    routerFactory: Router
+    routerFactory: Router(%consoleMode%)
     router: @routerFactory::createRouter
     authenticator: UserManager
     identity: UserIdentity
