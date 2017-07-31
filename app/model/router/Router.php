@@ -32,10 +32,10 @@ class Router {
             //$routes[] = new Route("LogIn", "User:logIn");
             //$routes[] = new Route("SignUp", "User:signUp");
             //$routes[] = new Route("SignOut", "User:signOut");
-            $type = UserPresenter::AVAILABILITY_TYPE_KEYWORD;
-            $types = implode("|", UserPresenter::AVAILABILITY_TYPES);
-            $routes[] = new Route($both . "<presenter user>/<action sign-up|sign-out|log-in>");
-            $routes[] = new Route($api . "<presenter user>/<action check-availability>/<{$type} {$types}>");
+            $type = CheckAvailabilityPresenter::AVAILABILITY_TYPE_KEYWORD;
+            $types = implode("|", CheckAvailabilityPresenter::AVAILABILITY_TYPES);
+            $routes[] = new Route($both . "<presenter auth|user>/<action sign-up|sign-out|log-in>");
+            $routes[] = new Route($api . "<presenter check-availability>/<{$type} {$types}>");
             $routes[] = new Route($html . "<presenter>/<action>", "HomePage:default");
         }
         return $routes;

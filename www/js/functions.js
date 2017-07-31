@@ -20,7 +20,7 @@ checkAvailability = function (type, val) {
     //TODO check upon submiting
 
     $.nette.ajax({
-        url: "/api/user/check-availability/" + type + "/",
+        url: "/api/check-availability/" + type + "/",
         data: {"value": val},
         method: "POST",
         success: function (r) {

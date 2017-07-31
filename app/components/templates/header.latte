@@ -6,11 +6,11 @@
         <a id="add-new-map" href="{plink Map:add}">+</a>
         {if $isLoggedIn}
             <span class="signed_in_as">{_"signed_in_as_label"}: <a
-                        href="{plink User:default}">{$identity->getUsername()}</a></span>
-            <a id="signOut" href="{plink User:SignOut}">{_"sign_out_label"}</a>
+                        href="{plink Profile:default}">{$identity->getUsername()}</a></span>
+            <a id="signOut" href="{plink Profile:SignOut}">{_"sign_out_label"}</a>
         {else}
-            <a id="signUp" href="{plink User:SignUp}">{_"sign_up_label"}</a>
-            <a id="logIn" href="{plink User:LogIn}">{_"log_in_label"}</a>
+            <a id="signUp" href="{plink Auth:SignUp}">{_"sign_up_label"}</a>
+            <a id="logIn" href="{plink Auth:LogIn}">{_"log_in_label"}</a>
         {/if}
     </div>
 </header>

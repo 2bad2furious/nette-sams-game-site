@@ -26,6 +26,12 @@ class UserManager implements \Nette\Security\IAuthenticator, \Nette\Security\IAu
 
     const DEFAULT_ROLES = [self::ROLE_USER];
 
+    const ONLY_GUESTS = [self::ROLE_GUEST];
+
+    const USERS = [self::ROLE_USER, self::ROLE_VERIFIED_USER];
+
+    const ONLY_VERIFIED = [self::ROLE_VERIFIED_USER];
+
     /**
      * UserAuthenticator constructor.
      * @param \Nette\Database\Context $database
@@ -55,7 +61,7 @@ class UserManager implements \Nette\Security\IAuthenticator, \Nette\Security\IAu
     }
 
     public function register(string $username, string $email, string $password, int $role, bool $admin): bool {
-
+        if (!$this->isUsernameOk($username) || !$this->isEmailOk($email)) throw new Exception("Invalid email or username");
         //do the next thing only if it is ok
         $result = 0;
         try {
@@ -125,7 +131,7 @@ class UserManager implements \Nette\Security\IAuthenticator, \Nette\Security\IAu
      * @param  string  \Nette\Security\privilege
      * @return bool
      */
-    function isAllowed($role, $resource, $privilege) {
+    public function isAllowed($role, $resource, $privilege) {
         diedump($role, $resource, $privilege);
     }
 
@@ -168,5 +174,9 @@ class UserManager implements \Nette\Security\IAuthenticator, \Nette\Security\IAu
     public
     function getOneByEmail(string $email):?UserIdentity {
         return $this->getOneBy(self::EMAIL, $email);
+    }
+
+    public function roleExists(string $role) {
+        return in_array($role, self::ROLES);
     }
 }
