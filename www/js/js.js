@@ -4,15 +4,12 @@
 $(document).ready(function () {
     checkLinksForBeingActive();
 
-    //init nette.ajax
-    $(function () {
-        $.nette.init();
+    LiveForm.setOptions({
+        showAllErrors: true,
+        wait: 50
     });
 
     $(".no-js").addClass("js");
-
-    bindEmailChecker();
-    bindUsernameChecker();
 
     $("a.disabled").click(function (e) {
         e.preventDefault();
@@ -21,5 +18,4 @@ $(document).ready(function () {
     $("span#header_menu_roll").click(function () {
         toggleMenu();
     });
-
 });
