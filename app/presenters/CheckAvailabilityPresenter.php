@@ -16,25 +16,22 @@ class CheckAvailabilityPresenter extends BasePresenter {
         $status = -1;
         $message = self::NO_PARAMETER_RECEIVED;
         $type = $this->getParameter(self::AVAILABILITY_TYPE_KEYWORD);
-        $value = $user = "";
         if ($this->isApiMethod() && in_array($type, self::AVAILABILITY_TYPES)) {
             if (isset($_POST["value"]) && $value = $_POST["value"]) {
                 if ($type === self::TYPE_USERNAME) {
-                    $user = $this->getUserManager()->getOneByName($value);
+                    $status = $this->getUserManager()->isUsernameUnique($value, $this->getUser()->getIdentity());
                 } else if ($type === self::TYPE_EMAIL) {
-                    $user = $this->getUserManager()->getOneByEmail($value);
+                    $status = $this->getUserManager()->isEmailUnique($value, $this->getUser()->getIdentity());
                 }
 
-                //sets to 1 if other user found and 0 if not or it is the current user
-                $status = intval(!($user instanceof UserIdentity && $user->getId() !== $this->getUser()->getId()));
-                if ($status === 0) {
-                    if ($type === self::TYPE_USERNAME) $message = UserManagementConstants::USERNAME_EXISTS;
-                    else if ($type === self::TYPE_EMAIL) $message = UserManagementConstants::EMAIL_EXISTS;
+                if ($status === false) {
+                    if ($type === self::TYPE_USERNAME) $message = UserManagement::USERNAME_EXISTS;
+                    else if ($type === self::TYPE_EMAIL) $message = UserManagement::EMAIL_EXISTS;
                 } else
                     $message = "";
             }
             $this->sendJson([
-                "status"  => $status,
+                "status"  => intval($status),
                 "message" => Translator::instance()->translate($message),
             ]);
         }
@@ -44,7 +41,8 @@ class CheckAvailabilityPresenter extends BasePresenter {
      * for access control
      * @return array
      */
-    protected function getRoles(): array {
+    protected
+    function getRoles(): array {
         return UserManager::ROLES;
     }
 }
