@@ -5,6 +5,11 @@ use Nette\Database\Row;
 
 class UserManager implements \Nette\Security\IAuthenticator, \Nette\Security\IAuthorizator {
     private $database;
+    /**
+     * @var TokenManager
+     */
+    private $tokenManager;
+
 
     //t1 column +table names
     const USER_TABLE = "user";
@@ -35,9 +40,11 @@ class UserManager implements \Nette\Security\IAuthenticator, \Nette\Security\IAu
     /**
      * UserAuthenticator constructor.
      * @param \Nette\Database\Context $database
+     * @param TokenManager $tokenManager
      */
-    public function __construct(Nette\Database\Context $database) {
+    public function __construct(Nette\Database\Context $database, TokenManager $tokenManager) {
         $this->database = $database;
+        $this->tokenManager = $tokenManager;
     }
 
     /**
@@ -61,18 +68,21 @@ class UserManager implements \Nette\Security\IAuthenticator, \Nette\Security\IAu
     }
 
     public function register(string $username, string $email, string $password, int $role, bool $admin): bool {
-        if (!$this->isUsernameOk($username) || !$this->isEmailOk($email)) throw new Exception("Invalid email or username");
-        //do the next thing only if it is ok
+        if (!$this->isUsernameOk($username) || !$this->isEmailOk($email) || !$this->isEmailUnique($email) || !$this->isUsernameUnique($username)) throw new Exception("Invalid email or username");
         $result = 0;
-        try {
-            $result = $this->database->table(self::USER_TABLE)->insert([
-                self::NICKNAME => $username,
-                self::PW       => Nette\Security\Passwords::hash($password),
-                self::EMAIL    => $email,
-                self::ROLE     => $role,
-                self::ADMIN    => $admin,
+        $result = $this->database->table(self::USER_TABLE)->insert([
+            self::NICKNAME => $username,
+            self::PW       => Nette\Security\Passwords::hash($password),
+            self::EMAIL    => $email,
+            self::ROLE     => $role,
+            self::ADMIN    => $admin,
 
-            ]);
+        ]);
+        try {
+            if ($result) {
+                \Tracy\Debugger::log($this->tokenManager->createNew(TokenManager::ACTION_USER_VERIFY, TokenManager::DAY, $this->database->getInsertId()));
+                //TODO insert MailQueue with verification link and stuff
+            }
         } catch (Exception $ex) {
             $result = 0;
         }
@@ -95,17 +105,12 @@ class UserManager implements \Nette\Security\IAuthenticator, \Nette\Security\IAu
     }
 
     /**
-     * @param string|Nette\Forms\Controls\TextInput $password
-     * @param string $useless
+     * @param string $password
      * @return bool
-     * @throws Exception
+     * @internal param string $useless
      */
     public
-    function isPasswordOk($password, $useless = "") {
-        if ($password instanceof Nette\Forms\Controls\TextInput)
-            $password = $password->getValue();
-        else if (!is_string($password)) throw new Exception("Invalid parameter");
-
+    function isPasswordOk(string $password) {
         return preg_match("/[0-9](.)*[0-9]/", $password) && preg_match("/[a-z](.)*[a-z]/", $password) && preg_match("/[A-Z](.)*[A-Z]/", $password);
     }
 
@@ -113,7 +118,8 @@ class UserManager implements \Nette\Security\IAuthenticator, \Nette\Security\IAu
     function isEmailOk(string $email): bool {
         try {
             $domain = explode("@", $email)[1];
-            return filter_var($email, FILTER_VALIDATE_EMAIL) && checkdnsrr($domain, 'MX');
+            //added A check after SO thread https://stackoverflow.com/a/1666823
+            return filter_var($email, FILTER_VALIDATE_EMAIL) && checkdnsrr($domain, 'MX') && checkdnsrr($domain, "A");
         } catch (Exception $ex) {
             return false;
         }
@@ -178,5 +184,27 @@ class UserManager implements \Nette\Security\IAuthenticator, \Nette\Security\IAu
 
     public function roleExists(string $role) {
         return in_array($role, self::ROLES);
+    }
+
+    /**
+     * @param string $username
+     * @param null|UserIdentity $user
+     * @return bool true if its ok(either completely new or current user's
+     */
+    public function isUsernameUnique(string $username, ?UserIdentity $user = null) {
+        $user_id = ($user instanceof UserIdentity) ? $user->getId() : null;
+        $user2 = $this->getOneByName($username);
+        return !($user2 instanceof UserIdentity && $user2->getId() !== $user_id);
+    }
+
+    /**
+     * @param string $email
+     * @param null|UserIdentity $user
+     * @return bool true if its ok(either completely new or current user's
+     */
+    public function isEmailUnique(string $email, ?UserIdentity $user = null) {
+        $user_id = ($user instanceof UserIdentity) ? $user->getId() : null;
+        $user2 = $this->getOneByEmail($email);
+        return !($user2 instanceof UserIdentity && $user2->getId() !== $user_id);
     }
 }
