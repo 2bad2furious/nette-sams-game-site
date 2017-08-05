@@ -2,23 +2,24 @@
 
 use Nette\Security\IAuthenticator;
 use Nette\Utils\ArrayHash;
-use TranslatableForm as Form;
+use BaseForm as Form;
 
 class AuthPresenter extends BasePresenter {
 
     /**
      * registers user
-     * @param TranslatableForm $form
+     * @param BaseForm $form
      */
     public function signUpFormSucceeded(Form $form) {
         $values = $form->getValues(true);
         try {
-            $result = $this->getUserManager()->register($values[UserManagementConstants::USERNAME], $values[UserManagementConstants::EMAIL], $values[UserManagementConstants::PASSWORD_1], UserManager::ROLE_USER, false);
+            $result = $this->getUserManager()->register($values[UserManagement::USERNAME], $values[UserManagement::EMAIL], $values[UserManagement::PASSWORD_1], UserManager::ROLE_USER, false);
         } catch (Exception $ex) {
+            throw $ex;
             $result = false;
         }
         if ($result === true) {
-            $this->flashMessage(UserManagementConstants::SIGN_UP_SUCCESS);
+            $this->flashMessage(UserManagement::SIGN_UP_SUCCESS);
             $this->redirect(303, "Auth:LogIn");
         } else {
             $this->flashMessage(self::SOMETHING_WENT_WRONG);
@@ -26,67 +27,56 @@ class AuthPresenter extends BasePresenter {
     }
 
     /**
-     * @param TranslatableForm $form
-     * @param ArrayHash $values
-     */
-    public function validateSignUpForm(Form $form, ArrayHash $values) {
-        $authenticator = $this->getUserManager();
-        $username = $values[UserManagementConstants::USERNAME];
-        $password = $values[UserManagementConstants::PASSWORD_1];
-        $email = $values[UserManagementConstants::EMAIL];
-
-        if ($authenticator->usernameExists($username)) {
-            $form->addError(UserManagementConstants::USERNAME_EXISTS);
-        } else if (!$authenticator->isUsernameOk($username))
-            $form->addError(UserManagementConstants::USERNAME_ALLOWED_CHARS);
-
-        if ($authenticator->emailExists($email)) {
-            $form->addError(UserManagementConstants::EMAIL_EXISTS);
-        }
-
-        if (!$authenticator->isPasswordOk($password))
-            $form->addError(UserManagementConstants::PASSWORD_MIN_SECURITY);
-    }
-
-    /**
-     * @return TranslatableForm
+     * @return BaseForm
      */
     public function createComponentSignUpForm() {
         $form = new Form();
-        $form->addText(UserManagementConstants::USERNAME, UserManagementConstants::USERNAME_LABEL)
-            ->setRequired(UserManagementConstants::USERNAME_REQUIRED)
-            ->addRule(Form::MIN_LENGTH, UserManagementConstants::USERNAME_MIN_LENGTH_TEXT, UserManagementConstants::USERNAME_MIN_LENGTH)
-            ->addRule(Form::MAX_LENGTH, UserManagementConstants::USERNAME_MAX_LENGTH_TEXT, UserManagementConstants::USERNAME_MAX_LENGTH);
-        $form->addEmail(UserManagementConstants::EMAIL, UserManagementConstants::EMAIL_LABEL)
-            ->setRequired(UserManagementConstants::EMAIL_REQUIRED);
-        $form->addPassword(UserManagementConstants::PASSWORD_1, UserManagementConstants::PASSWORD_LABEL, null, UserManagementConstants::PASSWORD_MAX_LENGTH)
-            ->setRequired(UserManagementConstants::PASSWORD_REQUIRED)
-            ->addRule([$this->getUserManager(), "isPasswordOk"], UserManagementConstants::PASSWORD_MIN_SECURITY, "")
-            ->addRule(Form::MIN_LENGTH, UserManagementConstants::PASSWORD_MIN_LENGTH, 8);
-        $form->addPassword(UserManagementConstants::PASSWORD_2, UserManagementConstants::PASSWORD_VERIFY_LABEL, null, UserManagementConstants::PASSWORD_MAX_LENGTH)
-            ->setRequired(UserManagementConstants::PASSWORD_VERIFY_REQUIRED)
-            ->addRule(Form::EQUAL, UserManagementConstants::PASSWORD_MUST_MATCH, $form["password_1"]);
-        $form->addSubmit("register", UserManagementConstants::SIGN_UP_SUBMIT_LABEL);
-        //checkEmail/UsernameExists And correct values
-        $form->onValidate[] = [$this, 'validateSignUpForm'];
-        $form->onSubmit[] = [$this, 'signUpFormSucceeded'];
+        $form->addText(UserManagement::USERNAME, UserManagement::USERNAME_LABEL)
+            ->setRequired(UserManagement::USERNAME_REQUIRED)
+            ->addRule(Form::MIN_LENGTH, UserManagement::USERNAME_MIN_LENGTH_TEXT, UserManagement::USERNAME_MIN_LENGTH)
+            ->addRule(function (\Nette\Forms\Controls\TextInput $username) {
+                return $this->getUserManager()->isUsernameOk($username->getValue());
+            }, UserManagement::USERNAME_ALLOWED_CHARS)
+            ->addRule(function (\Nette\Forms\Controls\TextInput $username) {
+                return $this->getUserManager()->isUsernameUnique($username->getValue());
+            }, UserManagement::USERNAME_EXISTS)
+            ->addRule(Form::MAX_LENGTH, UserManagement::USERNAME_MAX_LENGTH_TEXT, UserManagement::USERNAME_MAX_LENGTH);
+        $form->addEmail(UserManagement::EMAIL, UserManagement::EMAIL_LABEL)
+            ->setRequired(UserManagement::EMAIL_REQUIRED)
+            ->addRule(function (\Nette\Forms\Controls\TextInput $email) {
+                return $this->getUserManager()->isEmailUnique($email->getValue());
+            }, UserManagement::EMAIL_EXISTS)
+            ->addRule(function (\Nette\Forms\Controls\TextInput $email) {
+                return $this->getUserManager()->isEmailOk($email->getValue());
+            }, UserManagement::EMAIL_MX_ERROR);
+        $form->addPassword(UserManagement::PASSWORD_1, UserManagement::PASSWORD_LABEL, null, UserManagement::PASSWORD_MAX_LENGTH)
+            ->setRequired(UserManagement::PASSWORD_REQUIRED)
+            ->addRule(function (\Nette\Forms\Controls\TextInput $password) {
+                return $this->getUserManager()->isPasswordOk($password->getValue());
+            }, UserManagement::PASSWORD_MIN_SECURITY)
+            ->addRule(Form::MIN_LENGTH, UserManagement::PASSWORD_MIN_LENGTH, UserManagement::PASSWORD_MIN_LENGTH);
+        $form->addPassword(UserManagement::PASSWORD_2, UserManagement::PASSWORD_VERIFY_LABEL, null, UserManagement::PASSWORD_MAX_LENGTH)
+            ->setRequired(UserManagement::PASSWORD_VERIFY_REQUIRED)
+            ->addRule(Form::EQUAL, UserManagement::PASSWORD_MUST_MATCH, $form[UserManagement::PASSWORD_1]);
+        $form->addSubmit("register", UserManagement::SIGN_UP_SUBMIT_LABEL);
+        $form->onSuccess[] = [$this, 'signUpFormSucceeded'];
         return $form;
     }
 
     /**
-     * @param TranslatableForm $form
+     * @param BaseForm $form
      * @param ArrayHash $values
      */
     public function logInFormSucceeded(Form $form, ArrayHash $values) {
         try {
-            $this->getUser()->login($values[UserManagementConstants::USERNAME], $values[UserManagementConstants::PASSWORD]);
+            $this->getUser()->login($values[UserManagement::USERNAME], $values[UserManagement::PASSWORD]);
             $suc = $this->getUser()->isLoggedIn();
         } catch (Exception $exception) {
             $suc = false;
             $form->addError(self::SOMETHING_WENT_WRONG);
         }
         if ($suc) {
-            $this->flashMessage(UserManagementConstants::LOGIN_SUCCESS);
+            $this->flashMessage(UserManagement::LOGIN_SUCCESS);
             $this->redirect(303, "Profile:default");
         } else {
             $this->flashMessage(self::SOMETHING_WENT_WRONG);
@@ -96,23 +86,23 @@ class AuthPresenter extends BasePresenter {
     /**
      * checks if username exists and if the password is correct
      *
-     * @param TranslatableForm $form
+     * @param BaseForm $form
      * @param ArrayHash $values
      */
     public function logInFormValidate(Form $form, ArrayHash $values) {
         $authenticator = $this->getUserManager();
 
-        if (!$authenticator->usernameExists($values[UserManagementConstants::USERNAME]))
-            $form->addError(UserManagementConstants::USERNAME_NOT_EXIST);
+        if (!$authenticator->usernameExists($values[UserManagement::USERNAME]))
+            $form->addError(UserManagement::USERNAME_NOT_EXIST);
         else {
             try {
                 $authenticator->authenticate([
-                    IAuthenticator::USERNAME => $values[UserManagementConstants::USERNAME],
-                    IAuthenticator::PASSWORD => $values[UserManagementConstants::PASSWORD],
+                    IAuthenticator::USERNAME => $values[UserManagement::USERNAME],
+                    IAuthenticator::PASSWORD => $values[UserManagement::PASSWORD],
                 ]);
             } catch (Exception $ex) {
                 if ($ex instanceof \Nette\Security\AuthenticationException)
-                    $form->addError(UserManagementConstants::PASSWORD_AUTH_ERROR);
+                    $form->addError(UserManagement::PASSWORD_AUTH_ERROR);
                 else
                     $form->addError(self::SOMETHING_WENT_WRONG);
             }
@@ -120,15 +110,15 @@ class AuthPresenter extends BasePresenter {
     }
 
     /**
-     * @return TranslatableForm
+     * @return BaseForm
      */
     public function createComponentLogInForm() {
         $form = new Form();
-        $form->addText(UserManagementConstants::USERNAME, UserManagementConstants::USERNAME_LABEL, null, 255)
-            ->setRequired(UserManagementConstants::USERNAME_REQUIRED);
-        $form->addPassword(UserManagementConstants::PASSWORD, UserManagementConstants::PASSWORD_LABEL, null, 255)
-            ->setRequired(UserManagementConstants::PASSWORD_REQUIRED);
-        $form->addSubmit("login", UserManagementConstants::LOGIN_SUBMIT_LABEL);
+        $form->addText(UserManagement::USERNAME, UserManagement::USERNAME_LABEL, null, UserManagement::USERNAME_MAX_LENGTH)
+            ->setRequired(UserManagement::USERNAME_REQUIRED);
+        $form->addPassword(UserManagement::PASSWORD, UserManagement::PASSWORD_LABEL, null, 255)
+            ->setRequired(UserManagement::PASSWORD_REQUIRED);
+        $form->addSubmit("login", UserManagement::LOGIN_SUBMIT_LABEL);
         //checkExistsAndCorrectValues
         $form->onValidate[] = [$this, "logInFormValidate"];
         //login
@@ -143,4 +133,5 @@ class AuthPresenter extends BasePresenter {
     protected function getRoles(): array {
         return [UserManager::ROLE_GUEST];
     }
+
 }

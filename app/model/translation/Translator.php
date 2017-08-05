@@ -26,7 +26,7 @@ class Translator implements \Nette\Localization\ITranslator {
      */
     function translate($message, $count = null) {
         $newMessage = @$this->table[$message];
-        if (!is_string($newMessage)) trigger_error("Translation not found for '" . $message . "'");
-        return (string)$newMessage;
+        \Tracy\Debugger::log($message . " - " . $newMessage);
+        return $newMessage ? $newMessage : $message;
     }
 }
