@@ -1,5 +1,7 @@
 <?php
 
+use Nette\Utils\DateTime;
+
 function diedump($var) {
     foreach (func_get_args() as $arg) {
         \Tracy\Debugger::dump($arg);
@@ -17,17 +19,6 @@ function handleWarningsAndErrors(int $errno, string $errstr, string $errfile, in
 
 function getConnection(\Nette\DI\Container $container): Nette\Database\Connection {
     return $container->getByType(\Nette\Database\Connection::class);
-}
-
-function logException(Exception $ex) {
-    /* getConnection()->query("INSERT INTO error", [
-            "error_info" => json_encode([
-                "exception" => $ex,
-                "server" => $_SERVER,
-                "session" => $_SESSION,
-                "request" => $_REQUEST])
-        ]);*/
-    //todo send mail
 }
 
 set_error_handler("handleWarningsAndErrors");
@@ -71,7 +62,6 @@ try {
     $connection->commit();
 } catch (Exception $ex) {
     $connection->rollBack();
-    logException($ex);
     throw $ex;
     //echo "error occured";
 }
