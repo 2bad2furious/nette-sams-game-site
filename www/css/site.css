@@ -27,44 +27,6 @@ h3 {
   clear: both;
   display: table; }
 
-header {
-  background: white;
-  padding: 15px;
-  display: block;
-  border-bottom: 1px solid black;
-  max-height: 100vw;
-  overflow-y: auto;
-  color: black; }
-  header a#go_home {
-    float: left; }
-    header a#go_home img#logo {
-      height: 70px;
-      width: auto; }
-  header span#header_menu_roll {
-    float: right;
-    color: black;
-    text-decoration: none;
-    font-size: 70px;
-    cursor: pointer; }
-    header span#header_menu_roll:hover, header span#header_menu_roll:active {
-      color: red; }
-  header div#header-container {
-    overflow: hidden;
-    position: relative;
-    top: -500px;
-    vertical-align: middle;
-    padding: 1px;
-    font-size: 1rem;
-    text-align: center;
-    transition: all 1.3s linear; }
-    header div#header-container.active {
-      top: 0; }
-    header div#header-container a {
-      color: black;
-      font-size: 1.5rem;
-      text-decoration: none;
-      display: block; }
-
 footer {
   padding: 5px;
   border-top: 1px solid black; }
