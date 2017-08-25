@@ -11,6 +11,7 @@ class AuthPresenter extends BasePresenter {
      * @param BaseForm $form
      */
     public function signUpFormSucceeded(Form $form) {
+        diedump($form);
         $values = $form->getValues(true);
         try {
             $result = $this->getUserManager()->register($values[UserManagement::USERNAME], $values[UserManagement::EMAIL], $values[UserManagement::PASSWORD_1], UserManager::ROLE_USER, false);
@@ -31,16 +32,19 @@ class AuthPresenter extends BasePresenter {
      */
     public function createComponentSignUpForm() {
         $form = new Form();
+
         $form->addText(UserManagement::USERNAME, UserManagement::USERNAME_LABEL)
             ->setRequired(UserManagement::USERNAME_REQUIRED)
             ->addRule(Form::MIN_LENGTH, UserManagement::USERNAME_MIN_LENGTH_TEXT, UserManagement::USERNAME_MIN_LENGTH)
-            ->addRule(function (\Nette\Forms\Controls\TextInput $username) {
+            /*->addRule(function (\Nette\Forms\Controls\TextInput $username) {
                 return $this->getUserManager()->isUsernameOk($username->getValue());
-            }, UserManagement::USERNAME_ALLOWED_CHARS)
+            }, UserManagement::USERNAME_ALLOWED_CHARS)*/
+            ->addRule(Form::PATTERN, UserManagement::USERNAME_ALLOWED_CHARS, "[0-9a-zA-Z-_+]+")
             ->addRule(function (\Nette\Forms\Controls\TextInput $username) {
                 return $this->getUserManager()->isUsernameUnique($username->getValue());
             }, UserManagement::USERNAME_EXISTS)
             ->addRule(Form::MAX_LENGTH, UserManagement::USERNAME_MAX_LENGTH_TEXT, UserManagement::USERNAME_MAX_LENGTH);
+
         $form->addEmail(UserManagement::EMAIL, UserManagement::EMAIL_LABEL)
             ->setRequired(UserManagement::EMAIL_REQUIRED)
             ->addRule(function (\Nette\Forms\Controls\TextInput $email) {
@@ -49,15 +53,18 @@ class AuthPresenter extends BasePresenter {
             ->addRule(function (\Nette\Forms\Controls\TextInput $email) {
                 return $this->getUserManager()->isEmailOk($email->getValue());
             }, UserManagement::EMAIL_MX_ERROR);
+
         $form->addPassword(UserManagement::PASSWORD_1, UserManagement::PASSWORD_LABEL, null, UserManagement::PASSWORD_MAX_LENGTH)
             ->setRequired(UserManagement::PASSWORD_REQUIRED)
             ->addRule(function (\Nette\Forms\Controls\TextInput $password) {
                 return $this->getUserManager()->isPasswordOk($password->getValue());
             }, UserManagement::PASSWORD_MIN_SECURITY)
             ->addRule(Form::MIN_LENGTH, UserManagement::PASSWORD_MIN_LENGTH, UserManagement::PASSWORD_MIN_LENGTH);
+
         $form->addPassword(UserManagement::PASSWORD_2, UserManagement::PASSWORD_VERIFY_LABEL, null, UserManagement::PASSWORD_MAX_LENGTH)
             ->setRequired(UserManagement::PASSWORD_VERIFY_REQUIRED)
             ->addRule(Form::EQUAL, UserManagement::PASSWORD_MUST_MATCH, $form[UserManagement::PASSWORD_1]);
+
         $form->addSubmit("register", UserManagement::SIGN_UP_SUBMIT_LABEL);
         $form->onSuccess[] = [$this, 'signUpFormSucceeded'];
         return $form;
@@ -93,7 +100,7 @@ class AuthPresenter extends BasePresenter {
         $authenticator = $this->getUserManager();
 
         if (!$authenticator->usernameExists($values[UserManagement::USERNAME]))
-            $form->addError(UserManagement::USERNAME_NOT_EXIST);
+            $form->addError(UserManagement::USERNAME_NOT_EXIST_NEGATIVE);
         else {
             try {
                 $authenticator->authenticate([
@@ -113,7 +120,7 @@ class AuthPresenter extends BasePresenter {
      * @return BaseForm
      */
     public function createComponentLogInForm() {
-        $form = new Form();
+        $form = new Form($this->getTranslator());
         $form->addText(UserManagement::USERNAME, UserManagement::USERNAME_LABEL, null, UserManagement::USERNAME_MAX_LENGTH)
             ->setRequired(UserManagement::USERNAME_REQUIRED);
         $form->addPassword(UserManagement::PASSWORD, UserManagement::PASSWORD_LABEL, null, 255)

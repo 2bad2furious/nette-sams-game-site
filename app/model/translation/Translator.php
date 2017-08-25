@@ -4,18 +4,11 @@
 class Translator implements \Nette\Localization\ITranslator {
     private static $instance;
 
-
     private $table;
 
-    private function __construct() {
-        $this->table = English::getTable();
-    }
 
-    public static function instance(): Translator {
-        if (!self::$instance instanceof Translator) {
-            self::$instance = new Translator();
-        }
-        return self::$instance;
+    public function __construct() {
+        $this->table = English::getTable();
     }
 
     /**
@@ -27,6 +20,7 @@ class Translator implements \Nette\Localization\ITranslator {
     function translate($message, $count = null) {
         $newMessage = @$this->table[$message];
         \Tracy\Debugger::log($message . " - " . $newMessage);
+        if (!is_string($newMessage) && !in_array($message, $this->table)) trigger_error("Could not find translation for '{$message}'");
         return $newMessage ? $newMessage : $message;
     }
 }
