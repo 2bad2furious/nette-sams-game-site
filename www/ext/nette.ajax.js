@@ -1,7 +1,4 @@
 /**
- * Created by user on 27.07.2017.
- */
-/**
  * AJAX Nette Framework plugin for jQuery
  *
  * @copyright Copyright (c) 2009, 2010 Jan Marek
