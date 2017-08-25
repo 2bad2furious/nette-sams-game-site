@@ -27,8 +27,8 @@ class CheckAvailabilityPresenter extends BasePresenter {
                 if ($status === false) {
                     if ($type === self::TYPE_USERNAME) $message = UserManagement::USERNAME_EXISTS;
                     else if ($type === self::TYPE_EMAIL) $message = UserManagement::EMAIL_EXISTS;
-                } else
-                    $message = "";
+                }
+
             }
             $this->sendJson([
                 "status"  => intval($status),
