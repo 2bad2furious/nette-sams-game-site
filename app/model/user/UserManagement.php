@@ -1,12 +1,13 @@
 <?php
 
-
+/**
+ * This class was created just for consistency of used constants across multiple forms and pages.
+*/
 abstract class UserManagement {
 
     //errors and messages
     const USERNAME_REQUIRED = "username_required_form_label",
         PASSWORD_REQUIRED = "password_required_form_label",
-        USERNAME_NOT_EXIST = "username_not_exist_form_label",
         SIGN_OUT_TO_SIGN_UP = "sign_out_to_sign_up",
         USERNAME_EXISTS = "username_exists_form_label",
         LOGIN_SUCCESS = "login_success",
@@ -29,13 +30,17 @@ abstract class UserManagement {
         USERNAME_MAX_LENGTH_TEXT = "username_max_length",
         PASSWORD_MAX_LENGTH = 255,
         USER_LOGGED_OUT_TO_CHANGE = "user_logged_out_to_change_stuff",
-        ACTION_FOR_GUEST_ONLY = "action_for_users_only",
+        ACTION_FOR_GUEST_ONLY = "action_for_guests_only",
         ACTION_FOR_GUEST_ONLY_ADDITIONAL = "action_for_guest_only_additional",
         ACTION_FOR_VERIFIED_ONLY = "action_for_verified_only",
         ACTION_FOR_VERIFIED_ONLY_ADDITIONAL = "action_for_verified_only_additional",
         ACTION_FOR_USERS_ONLY = "action_for_users_only",
         ACTION_FOR_USERS_ONLY_ADDITIONAL = "action_for_users_only_additional",
-        EMAIL_MX_ERROR = "email_mx_error";
+        EMAIL_MX_ERROR = "email_mx_error",
+        EMAIL_NOT_EXIST_POSITIVE = "email_not_exist_positive",
+        EMAIL_NOT_EXIST_NEGATIVE = "email_not_exist_negative",
+        USERNAME_NOT_EXIST_POSITIVE = "username_not_exist_positive",
+        USERNAME_NOT_EXIST_NEGATIVE = "username_not_exist_negative";
 
     //name attrs
     const USERNAME = "username",
