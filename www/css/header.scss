@@ -1,0 +1,57 @@
+header {
+  display: block;
+  width: 100%;
+
+  padding: 10px;
+  &.alone {
+    ul {
+      height: initial !important;
+    }
+  }
+
+  #go-home {
+    float: left;
+    img {
+      height: 60px;
+      width: auto;
+    }
+  }
+
+  #header_menu_roll {
+    float: right;
+    cursor: pointer;
+
+    color: initial;
+    text-decoration: none;
+
+    font-size: 1.8rem;
+    display: block;
+
+    text-align: center;
+
+    &:hover, &:focus, &:visited, &:active {
+      text-decoration: none;
+      color: initial;
+    }
+
+  }
+
+  ul#header-container {
+    height: 0px;
+    margin: 0 auto;
+    width: 70%;
+    padding: 0px;
+    display: block;
+    overflow: hidden;
+    h1 {
+      margin: 0;
+      font-size: 1.5rem;
+    }
+
+    li {
+      display: block;
+      text-align: center;
+      margin: 0;
+    }
+  }
+}

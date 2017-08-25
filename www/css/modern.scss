@@ -1,4 +1,77 @@
 /* use this instead of display:grid because of Edge - thank you, Microsoft*/
 @supports (grid-area: auto) {
+  body {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: min-content min-content 1fr min-content;
+    grid-template-areas: "header" "messages" "content" "footer";
+    min-height: 100vh;
+    header {
+      grid-area: header;
 
+      display: grid;
+      grid-template-columns: min-content 1fr;
+      grid-template-rows: 1fr;
+      grid-template-areas: "logo nav";
+      #go-home {
+        float: none;
+        grid-area: logo;
+      }
+
+      #header_menu_roll {
+        display: none;
+      }
+      /* a bit too complicated but cleaner */
+      nav {
+        grid-area: nav;
+        ul#header-container {
+          margin: 0;
+          width: 100%;
+          height: initial;
+          display: grid;
+          justify-content: end;
+          grid-template-rows: 1fr;
+          grid-gap: 4%;
+
+          &.logged-in {
+            grid-template-columns: auto auto auto;
+            grid-template-areas: "maps logged-in-as log-out";
+
+            li {
+              &#manage-your-maps {
+                grid-area: maps;
+              }
+              &#logged-in-as {
+                grid-area: logged-in-as;
+              }
+              &#log-out {
+                grid-area: log-out;
+              }
+            }
+          }
+
+          &.logged-out {
+            grid-template-columns:auto auto;
+            grid-template-areas: "log-in sign-up";
+
+            li {
+              &#sign-up {
+                grid-area: sign-up;
+              }
+
+              &#log-in {
+                grid-area: log-in;
+              }
+            }
+          }
+
+        }
+      }
+      &.alone {
+        ul {
+          display: block;
+        }
+      }
+    }
+  }
 }
