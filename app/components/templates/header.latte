@@ -1,16 +1,46 @@
-<header class="no-js clearfix">
+<header class="clearfix {php echo $isAlone?"alone":""}">
     {*<a id="go_home" href="/"><img id="logo" src="/uploads/logo_small_v5.png"></a>*}
-    <span id="header_menu_roll" class="fa fa-bars" aria-hidden="true">
-    </span>
-    <div id="header-container">
-        <a id="add-new-map" href="{plink Map:add}">+</a>
-        {if $isLoggedIn}
-            <span class="signed_in_as">{_"signed_in_as_label"}: <a
-                        href="{plink Profile:default}">{$identity->getUsername()}</a></span>
-            <a id="signOut" href="{plink Profile:SignOut}">{_"sign_out_label"}</a>
-        {else}
-            <a id="signUp" href="{plink Auth:SignUp}">{_"sign_up_label"}</a>
-            <a id="logIn" href="{plink Auth:LogIn}">{_"log_in_label"}</a>
-        {/if}
-    </div>
+    {if !$isAlone}
+        <a id="header_menu_roll" class="fa fa-bars disabled" aria-hidden="true" href="{plink Header:default}"></a>
+    {/if}
+    <a id="go-home" href="/"><img src="/uploads/logo_small.png"></a>
+    <nav>
+        <ul id="header-container" class="{$isLoggedIn?"logged-in":"logged-out"}">
+            {if $isAlone}
+                <li>
+                    <h1>{_"site_navigation"}:</h1>
+                </li>
+            {/if}
+            {if $isLoggedIn}
+                <li id="manage-your-maps">
+                    <a href="{plink Map:manage}">
+                        {_"manage_your_maps"}
+                    </a>
+                </li>
+                <li id="signed-in-as">
+                    <span>{_"signed_in_as_label"}:
+                        <a href="{plink Profile:default}">
+                            {$identity->getUsername()}
+                        </a>
+                    </span>
+                </li>
+                <li id="sign-out">
+                    <a id="signOut" href="{plink Profile:SignOut}">
+                        {_"sign_out_label"}
+                    </a>
+                </li>
+            {else}
+                <li id="sign-up">
+                    <a id="signUp" href="{plink Auth:SignUp}">
+                        {_"sign_up_label"}
+                    </a>
+                </li>
+                <li id="log-in">
+                    <a id="logIn" href="{plink Auth:LogIn}">
+                        {_"log_in_label"}
+                    </a>
+                </li>
+            {/if}
+        </ul>
+    </nav>
 </header>
