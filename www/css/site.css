@@ -4,7 +4,11 @@ html, body, a {
   margin: 0; }
 
 html {
-  font-size: 16px; }
+  font-size: 100%;
+  max-width: 100vw; }
+
+body {
+  overflow-y: scroll; }
 
 * {
   transition: all 0.3s linear;
@@ -27,6 +31,43 @@ h3 {
   clear: both;
   display: table; }
 
+header {
+  display: block;
+  width: 100%;
+  padding: 10px; }
+  header.alone ul {
+    height: initial !important; }
+  header #go-home {
+    float: left; }
+    header #go-home img {
+      height: 60px;
+      width: auto; }
+  header #header_menu_roll {
+    float: right;
+    cursor: pointer;
+    color: initial;
+    text-decoration: none;
+    font-size: 1.8rem;
+    display: block;
+    text-align: center; }
+    header #header_menu_roll:hover, header #header_menu_roll:focus, header #header_menu_roll:visited, header #header_menu_roll:active {
+      text-decoration: none;
+      color: initial; }
+  header ul#header-container {
+    height: 0px;
+    margin: 0 auto;
+    width: 70%;
+    padding: 0px;
+    display: block;
+    overflow: hidden; }
+    header ul#header-container h1 {
+      margin: 0;
+      font-size: 1.5rem; }
+    header ul#header-container li {
+      display: block;
+      text-align: center;
+      margin: 0; }
+
 footer {
   padding: 5px;
   border-top: 1px solid black; }
@@ -35,10 +76,64 @@ footer {
     text-align: center; }
 
 /* use this instead of display:grid because of Edge - thank you, Microsoft*/
+@supports (grid-area: auto) {
+  body {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: min-content min-content 1fr min-content;
+    grid-template-areas: "header" "messages" "content" "footer";
+    min-height: 100vh; }
+    body header {
+      grid-area: header;
+      display: grid;
+      grid-template-columns: min-content 1fr;
+      grid-template-rows: 1fr;
+      grid-template-areas: "logo nav";
+      /* a bit too complicated but cleaner */ }
+      body header #go-home {
+        float: none;
+        grid-area: logo; }
+      body header #header_menu_roll {
+        display: none; }
+      body header nav {
+        grid-area: nav; }
+        body header nav ul#header-container {
+          margin: 0;
+          width: 100%;
+          height: initial;
+          display: grid;
+          justify-content: end;
+          grid-template-rows: 1fr;
+          grid-gap: 4%; }
+          body header nav ul#header-container.logged-in {
+            grid-template-columns: auto auto auto;
+            grid-template-areas: "maps logged-in-as log-out"; }
+            body header nav ul#header-container.logged-in li#manage-your-maps {
+              grid-area: maps; }
+            body header nav ul#header-container.logged-in li#logged-in-as {
+              grid-area: logged-in-as; }
+            body header nav ul#header-container.logged-in li#log-out {
+              grid-area: log-out; }
+          body header nav ul#header-container.logged-out {
+            grid-template-columns: auto auto;
+            grid-template-areas: "log-in sign-up"; }
+            body header nav ul#header-container.logged-out li#sign-up {
+              grid-area: sign-up; }
+            body header nav ul#header-container.logged-out li#log-in {
+              grid-area: log-in; }
+      body header.alone ul {
+        display: block; } }
 /* some stuff comes from https://github.com/engageinteractive/core/blob/master/src/scss/utility/_mixins.scss */
 a {
   cursor: pointer; }
   a.disabled {
     cursor: default; }
+
+main#content {
+  display: block; }
+  main#content.default {
+    width: 70%;
+    margin: 0 auto;
+    padding: 10px; }
 
 /*# sourceMappingURL=site.css.map */
