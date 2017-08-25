@@ -14,9 +14,8 @@ abstract class BasePresenter extends Presenter {
 
     private $identity;
 
-    public function startup() {
-        $this->template->setTranslator(Translator::instance());
-        parent::startup();
+    public function beforeRender() {
+        $this->template->setTranslator($this->getTranslator());
     }
 
     public function getIdentity(): UserIdentity {
@@ -41,26 +40,28 @@ abstract class BasePresenter extends Presenter {
             if ($this->hasUserRole($role)) return;
         }
 
+        $translator = $this->getTranslator();
+
         if (!array_diff($roles, UserManager::ONLY_GUESTS)) {
             $title = UserManagement::ACTION_FOR_GUEST_ONLY;
-            $additional = sprintf(Translator::instance()->translate(UserManagement::ACTION_FOR_GUEST_ONLY_ADDITIONAL), $this->link("Auth:logIn"));
+            $additional = sprintf($translator->translate(UserManagement::ACTION_FOR_GUEST_ONLY_ADDITIONAL), $this->link("Auth:logIn"));
 
             //if user is logged and need verification
         } else if (!array_diff($roles, UserManager::ONLY_VERIFIED) && $this->getUser()->isLoggedIn()) {
             $title = UserManagement::ACTION_FOR_VERIFIED_ONLY;
-            $additional = sprintf(Translator::instance()->translate(UserManagement::ACTION_FOR_VERIFIED_ONLY_ADDITIONAL), $this->link("Profile:resend"));
+            $additional = sprintf($translator->translate(UserManagement::ACTION_FOR_VERIFIED_ONLY_ADDITIONAL), $this->link("Profile:resend"));
 
             //if user is not logged
         } else if (!array_diff($roles, UserManager::ONLY_VERIFIED) || !array_diff($roles, UserManager::USERS)) {
             $title = UserManagement::ACTION_FOR_USERS_ONLY;
-            $additional = sprintf(Translator::instance()->translate(UserManagement::ACTION_FOR_USERS_ONLY_ADDITIONAL), $this->link("Auth:logIn"), $this->link("Auth:signUp"));
+            $additional = sprintf($translator->translate(UserManagement::ACTION_FOR_USERS_ONLY_ADDITIONAL), $this->link("Auth:logIn"), $this->link("Auth:signUp"));
         } else throw new Exception("Unknown role configuration");
 
-        $this->template->setTranslator(Translator::instance());
+        $this->template->setTranslator($translator);
         $this->template->setFile(__DIR__ . "/templates/rights/rights.latte");
         $this->template->additional = $additional;
         $this->template->user = $this->getUser()->getIdentity();
-        $this->template->title = Translator::instance()->translate($title);
+        $this->template->title = $translator->translate($title);
         $this->template->render();
         $this->terminate();
     }
@@ -84,10 +85,11 @@ abstract class BasePresenter extends Presenter {
     }
 
     public function getUserManager(): UserManager {
-        $authenticator = $this->getUser()->getAuthenticator(true);
-        if ($authenticator instanceof UserManager)
-            return $authenticator;
-        throw new Exception("Wrong type of Authenticator");
+        return $this->getUser()->getAuthenticator(true);
+    }
+
+    public function getTranslator(): Translator {
+        return $this->context->getByType(Translator::class);
     }
 
     protected function isApiMethod(): bool {
