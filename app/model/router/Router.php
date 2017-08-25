@@ -40,12 +40,20 @@ class Router {
             $routes[] = new Route($both . "<presenter map>[/<id=0 [0-9]+>]", [
                 "action" => "show",
             ]);
-            $routes[] = new Route($both . "<presenter auth|profile>/<action sign-up|sign-out|log-in>");
+            $routes[] = new Route($both . "<presenter auth>/<action sign-up|log-in>");
             //API
             $routes[] = new Route($api . "<presenter check-availability>/<{$type} {$types}>");
+            $routes[] = new Route($api . "<presenter log>[/<action=default default>]");
             //HTML
-            $routes[] = new Route($html."<presenter map>/<action add|edit|delete>");
-            $routes[] = new Route($html."[<presenter=HomePage HomePage>/][<action=default default>]");
+            $charset = TokenManager::CHARSET;
+
+            $routes[] = new Route($html . "<presenter profile>[/<action=default default|edit-username|sign-out|resend>]");
+            $routes[] = new Route($html . "<presenter profile>/<action verify>/<token [{$charset}]+>");
+            $routes[] = new Route($html . "<presenter map>/<action add|edit|delete|manage>");
+
+            $routes[] = new Route($html . "<presenter notes>[/<action=default default>]");
+            $routes[] = new Route($html . "<presenter header>[/<action=default default>]");
+            $routes[] = new Route($html . "[<presenter=HomePage HomePage>/][<action=default default>]");
         }
         return $routes;
     }
