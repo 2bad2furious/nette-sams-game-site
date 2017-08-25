@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{ifset $title}
         {$title|trim} | {_"site_title_short"}
         {else} {_"site_title"}
@@ -9,27 +10,32 @@
     <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"
           integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
     <link rel="stylesheet" media="screen" href="/css/site.css" type="text/css"/>
-    <noscript>
-        <link href="/css/noscript.css" rel="stylesheet" type="text/css">
-    </noscript>
     <script src="https://code.jquery.com/jquery-3.2.1.min.js"
             integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
             crossorigin="anonymous" type="application/javascript"></script>
     <script src="https://cdn.rawgit.com/contributte/live-form-validation/v1.8.1/live-form-validation.js"
             type="application/javascript"></script>
+    <script src="/ext/nette.ajax.js" type="application/javascript"></script>
     <script src="/js/functions.js" type="application/javascript"></script>
     <script src="/js/js.js" type="application/javascript"></script>
+    <noscript>
+        <link href="/css/noscript.css" rel="stylesheet" type="text/css">
+    </noscript>
 </head>
 <body>
-{control header}
-<div id="content">
-    {include content}
-</div>
-<div>
+{default $isAlone = false}
+{control header $isAlone}
+<div id="flash-message-container">
     {foreach $flashes as $flash}
-        <div class="flash {$flash->type}">{_}{$flash->message}{/_}</div>
+        <div class="flash-message {$flash->type}">{_}{$flash->message}{/_}.</div>
     {/foreach}
 </div>
+<main id="content" class="default">
+    {include content}
+    TODO ref pro login a register<br>
+    TODO mailqueue<br>
+    TODO send mails on register and resend<br>
+</main>
 <footer>
     <div>
         © {php echo date('Y')} - Martin Macura, proudly powered by Nette
