@@ -25,13 +25,17 @@
       nav {
         grid-area: nav;
         ul#header-container {
+          height: 100%;
           margin: 0;
           width: 100%;
-          height: initial;
           display: grid;
           justify-content: end;
           grid-template-rows: 1fr;
           grid-gap: 4%;
+
+          li {
+            align-self: center;
+          }
 
           &.logged-in {
             grid-template-columns: auto auto auto;
@@ -51,7 +55,7 @@
           }
 
           &.logged-out {
-            grid-template-columns:auto auto;
+            grid-template-columns: auto auto;
             grid-template-areas: "log-in sign-up";
 
             li {

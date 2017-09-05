@@ -2,7 +2,8 @@ header {
   display: block;
   width: 100%;
 
-  padding: 10px;
+  padding: 10px;;
+  background-color: #f39c12;
   &.alone {
     ul {
       height: initial !important;
@@ -10,39 +11,40 @@ header {
   }
 
   #go-home {
-    float: left;
-    img {
-      height: 60px;
-      width: auto;
-    }
+    display:inline-block;
+    background: url("/uploads/logo_small.png") no-repeat;
+    background-size: 43px 30px;
+    text-indent: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    height: 30px;
+    width: 43px;
   }
 
   #header_menu_roll {
-    float: right;
+    display:inline-block;
     cursor: pointer;
 
     color: initial;
     text-decoration: none;
-
-    font-size: 1.8rem;
-    display: block;
-
-    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
 
     &:hover, &:focus, &:visited, &:active {
       text-decoration: none;
       color: initial;
     }
-
   }
 
   ul#header-container {
+    //position: relative;
+    //top: 80px;
     height: 0px;
     margin: 0 auto;
     width: 70%;
     padding: 0px;
     display: block;
-    overflow: hidden;
+    overflow-y: hidden;
     h1 {
       margin: 0;
       font-size: 1.5rem;
@@ -52,6 +54,10 @@ header {
       display: block;
       text-align: center;
       margin: 0;
+
+      &:hover {
+        color: white;;
+      }
     }
   }
 }

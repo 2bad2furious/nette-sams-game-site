@@ -4,13 +4,6 @@
 use Nette\Database\Row;
 
 class UserManager implements \Nette\Security\IAuthenticator, \Nette\Security\IAuthorizator {
-    private $database;
-    /**
-     * @var TokenManager
-     */
-    private $tokenManager;
-
-
     //t1 column +table names
     const USER_TABLE = "user";
     const USER_ID = "user_id",
@@ -36,6 +29,12 @@ class UserManager implements \Nette\Security\IAuthenticator, \Nette\Security\IAu
     const USERS = [self::ROLE_USER, self::ROLE_VERIFIED_USER];
 
     const ONLY_VERIFIED = [self::ROLE_VERIFIED_USER];
+    const USERNAME_CHARSET = "/[^0-9a-zA-Z-_+]/";
+
+    private $database;
+
+    private $tokenManager;
+
 
     /**
      * UserAuthenticator constructor.
@@ -44,8 +43,9 @@ class UserManager implements \Nette\Security\IAuthenticator, \Nette\Security\IAu
      */
     public function __construct(Nette\Database\Context $database, TokenManager $tokenManager) {
         $this->database = $database;
-        $this->tokenManager = $tokenManager;
+        $this->tokenManager;
     }
+
 
     /**
      * Performs an authentication against e.g. database.
@@ -67,9 +67,8 @@ class UserManager implements \Nette\Security\IAuthenticator, \Nette\Security\IAu
         return new UserIdentity($user->{self::USER_ID}, $user->{self::NICKNAME}, $user->{self::EMAIL}, $user->{self::DESCRIPTION}, $user->{self::ROLE}, $user->{self::ADMIN});
     }
 
-    public function register(string $username, string $email, string $password, int $role, bool $admin): bool {
+    public function register(string $username, string $email, string $password, int $role, bool $admin): ?UserIdentity {
         if (!$this->isUsernameOk($username) || !$this->isEmailOk($email) || !$this->isEmailUnique($email) || !$this->isUsernameUnique($username)) throw new Exception("Invalid email or username");
-        $result = 0;
         $result = $this->database->table(self::USER_TABLE)->insert([
             self::NICKNAME => $username,
             self::PW       => Nette\Security\Passwords::hash($password),
@@ -78,16 +77,7 @@ class UserManager implements \Nette\Security\IAuthenticator, \Nette\Security\IAu
             self::ADMIN    => $admin,
 
         ]);
-        try {
-            if ($result) {
-                \Tracy\Debugger::log($this->tokenManager->createNew(TokenManager::ACTION_USER_VERIFY, TokenManager::DAY, $this->database->getInsertId()));
-                //TODO insert MailQueue with verification link and stuff
-            }
-        } catch (Exception $ex) {
-            $result = 0;
-        }
-        if (!$result) $this->database->rollBack();
-        return boolval($result);
+        return $result ? $this->getOneByEmail($email) : null;
     }
 
     public
@@ -127,7 +117,7 @@ class UserManager implements \Nette\Security\IAuthenticator, \Nette\Security\IAu
 
     public
     function isUsernameOk(string $username): bool {
-        return !preg_match("/[^0-9a-zA-Z-_+]/", $username);
+        return !preg_match(self::USERNAME_CHARSET, $username);
     }
 
     /**
@@ -206,5 +196,10 @@ class UserManager implements \Nette\Security\IAuthenticator, \Nette\Security\IAu
         $user_id = ($user instanceof UserIdentity) ? $user->getId() : null;
         $user2 = $this->getOneByEmail($email);
         return !($user2 instanceof UserIdentity && $user2->getId() !== $user_id);
+    }
+
+    public function injectTokenManager(TokenManager $tokenManager) {
+        diedump(func_get_args(), "xd");
+        $this->tokenManager = $tokenManager;
     }
 }

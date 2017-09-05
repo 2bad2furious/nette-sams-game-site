@@ -5,7 +5,6 @@ $background-color2: black;
 @import "header";
 @import "footer";
 @import "modern";
-
 /* some stuff comes from https://github.com/engageinteractive/core/blob/master/src/scss/utility/_mixins.scss */
 a {
   cursor: pointer;
@@ -14,11 +13,20 @@ a {
   }
 }
 
-main#content {
+#flash-message-container {
+  .flash-message {
+    padding: 10px;
+    &.info {
+      background: #4CAF50;
+    }
+  }
+}
+
+main#content, #flash-message-container {
   display: block;
-  &.default {
-    width:70%;
-    margin:0 auto;
-    padding:10px;
+  &.centered {
+    width: 70%;
+    margin: 0 auto;
+    padding: 10px;
   }
 }

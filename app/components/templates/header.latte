@@ -1,9 +1,11 @@
-<header class="clearfix {php echo $isAlone?"alone":""}">
+<header class="{php echo $isAlone?"alone":""}">
     {*<a id="go_home" href="/"><img id="logo" src="/uploads/logo_small_v5.png"></a>*}
     {if !$isAlone}
-        <a id="header_menu_roll" class="fa fa-bars disabled" aria-hidden="true" href="{plink Header:default}"></a>
+        <a id="header_menu_roll" class="disabled" href="{plink Header:default}">
+            <i class="fa fa-bars"aria-hidden="true"></i>
+        </a>
     {/if}
-    <a id="go-home" href="/"><img src="/uploads/logo_small.png"></a>
+    <a id="go-home" href="/">Go Home</a>
     <nav>
         <ul id="header-container" class="{$isLoggedIn?"logged-in":"logged-out"}">
             {if $isAlone}

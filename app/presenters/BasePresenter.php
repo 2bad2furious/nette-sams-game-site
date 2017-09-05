@@ -12,6 +12,11 @@ abstract class BasePresenter extends Presenter {
     const SOMETHING_WENT_WRONG = "something_went_wrong",
         NO_PARAMETER_RECEIVED = "no_parameter_received";
 
+    const MESSAGE_TYPE_INFO = "info",
+        MESSAGE_TYPE_ERROR = "error",
+        MESSAGE_TYPE_WARNING = "warning",
+        MESSAGE_TYPES = [self::MESSAGE_TYPE_INFO, self::MESSAGE_TYPE_ERROR, self::MESSAGE_TYPE_WARNING];
+
     private $identity;
 
     public function beforeRender() {
@@ -92,6 +97,14 @@ abstract class BasePresenter extends Presenter {
         return $this->context->getByType(Translator::class);
     }
 
+    public function getMailer(): MailerWrapper {
+        return $this->context->getByType(MailerWrapper::class);
+    }
+
+    public function getFormFactory(): FormFactory {
+        return $this->context->getByType(FormFactory::class);
+    }
+
     protected function isApiMethod(): bool {
         return $this->getParameter("method") === self::API_METHOD;
     }
@@ -100,6 +113,22 @@ abstract class BasePresenter extends Presenter {
         return $this->getParameter("method") === self::HTML_METHOD;
     }
 
+    /**
+     * forces you to use constants, just to prettify code
+     * @param string $message
+     * @param string $type
+     * @return stdClass
+     * @throws Exception
+     */
+    public function flashMessage($message, $type = self::MESSAGE_TYPE_INFO): StdClass {
+        if (!in_array($type, self::MESSAGE_TYPES)) throw new Exception("You should use the constants provided");
+        return parent::flashMessage($message, $type);
+    }
+
+    protected function error404(string $message = "") {
+        $this->error($message);
+        $this->terminate();
+    }
 
     /**
      * for access control

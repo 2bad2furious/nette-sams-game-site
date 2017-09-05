@@ -61,6 +61,10 @@ class UserIdentity implements \Nette\Security\IIdentity {
         return $this->admin;
     }
 
+    public function isVerified(): bool {
+        return $this->getRole() === UserManager::ROLE_VERIFIED_USER;
+    }
+
     function getRoles(): array {
         return [$this->getRole()];
     }

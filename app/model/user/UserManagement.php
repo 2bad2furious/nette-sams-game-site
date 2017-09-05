@@ -2,7 +2,7 @@
 
 /**
  * This class was created just for consistency of used constants across multiple forms and pages.
-*/
+ */
 abstract class UserManagement {
 
     //errors and messages
@@ -58,4 +58,6 @@ abstract class UserManagement {
         PROFILE_EDIT_SUBMIT_LABEL = "profile_edit_submit_form_label",
         PASSWORD_VERIFY_LABEL = "password_verify_form_label";
 
+    const REGISTER_EMAIL_TITLE = "register_email_title",
+        REGISTER_EMAIL_MESSAGE = "register_email_message";
 }

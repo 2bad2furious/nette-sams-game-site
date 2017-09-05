@@ -15,6 +15,6 @@ abstract class BaseControl extends \Nette\Application\UI\Control {
 
 
     protected function initTranslator() {
-        $this->template->setTranslator(Translator::instance());
+        $this->template->setTranslator($this->getPresenter()->getTranslator());
     }
 }

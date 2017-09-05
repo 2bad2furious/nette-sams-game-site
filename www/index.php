@@ -9,22 +9,26 @@ function diedump($var) {
     exit();
 }
 
-function exception() {
-    throw new Exception("called");
-}
-
 function handleWarningsAndErrors(int $errno, string $errstr, string $errfile, int $errline, array $errcontext) {
     throw new ErrorException($errstr, $errno, 1, $errfile, $errline, null);
 }
 
-function getConnection(\Nette\DI\Container $container): Nette\Database\Connection {
-    return $container->getByType(\Nette\Database\Connection::class);
-}
-
 set_error_handler("handleWarningsAndErrors");
 
-if (isset($_SERVER["TOKEN"]) && $session_id = $_SERVER["TOKEN"]) {
+
+/** checks headers for token
+ * if found, sets the session_id as the token
+ * else sends back a new token
+ */
+if (isset($_SERVER["HTTP_TOKEN"]) && $session_id = $_SERVER["HTTP_TOKEN"]) {
     session_id($session_id);
+    $token = $session_id;
+} else if (!isset($_COOKIE["PHPSESSID"])) {
+    $token = session_id();
+    if (!$token) {
+        $token = session_create_id();
+    }
+    header("HTTP_TOKEN: $token", false);
 }
 
 require_once __DIR__ . "/../vendor/autoload.php";
@@ -34,7 +38,7 @@ $configurator = new Nette\Configurator;
 
 $configurator->setDebugMode("192.168.1.54");
 
-// prod mode => $configurator->setDebugMode(false);
+/* prod mode =>S $configurator->setDebugMode(false);/* */
 
 // Enable Tracy for error visualisation & logging
 $configurator->enableTracy(__DIR__ . '/../log');
@@ -51,7 +55,7 @@ $configurator->addConfig(__DIR__ . "/../config/config.product.neon");
 
 $container = $configurator->createContainer();
 
-$connection = getConnection($container);
+$connection = $container->getByType(\Nette\Database\Context::class);
 $connection->beginTransaction();
 
 try {

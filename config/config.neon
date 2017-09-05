@@ -1,5 +1,5 @@
 session:
-    autoStart: smart
+    autoStart: yes
     cookieParth: '/'
     expiration: 10 days
     identity: UserIdentity
@@ -8,4 +8,9 @@ services:
     routerFactory: Router(%consoleMode%)
     router: @routerFactory::createRouter
     authenticator: UserManager
-    tokenManager: TokenManager
+    - TokenManager
+    - Translator
+    - MapManager
+    - MailerWrapper
+    - FormFactory
+    - Nette\Mail\SmtpMailer

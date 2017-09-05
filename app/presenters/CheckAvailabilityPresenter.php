@@ -32,7 +32,7 @@ class CheckAvailabilityPresenter extends BasePresenter {
             }
             $this->sendJson([
                 "status"  => intval($status),
-                "message" => Translator::instance()->translate($message),
+                "message" => $this->getTranslator()->translate($message),
             ]);
         }
     }

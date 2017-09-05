@@ -5,17 +5,22 @@ html, body, a {
 
 html {
   font-size: 100%;
-  max-width: 100vw; }
-
-body {
-  overflow-y: scroll; }
-
-* {
-  transition: all 0.3s linear;
+  max-width: 100vw;
+  transition: all 0.15s linear;
   box-sizing: border-box;
   font-family: "Open Sans", sans-serif;
   line-height: 1.7rem;
-  vertical-align: middle; }
+  color: black; }
+
+* {
+  box-sizing: inherit;
+  color: inherit;
+  transition: inherit;
+  font-family: inherit;
+  font-size: inherit; }
+
+body {
+  overflow-y: scroll; }
 
 h1 {
   font-size: 2rem; }
@@ -34,22 +39,26 @@ h3 {
 header {
   display: block;
   width: 100%;
-  padding: 10px; }
+  padding: 10px;
+  background-color: #f39c12; }
   header.alone ul {
     height: initial !important; }
   header #go-home {
-    float: left; }
-    header #go-home img {
-      height: 60px;
-      width: auto; }
+    display: inline-block;
+    background: url("/uploads/logo_small.png") no-repeat;
+    background-size: 43px 30px;
+    text-indent: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    height: 30px;
+    width: 43px; }
   header #header_menu_roll {
-    float: right;
+    display: inline-block;
     cursor: pointer;
     color: initial;
     text-decoration: none;
-    font-size: 1.8rem;
-    display: block;
-    text-align: center; }
+    white-space: nowrap;
+    overflow: hidden; }
     header #header_menu_roll:hover, header #header_menu_roll:focus, header #header_menu_roll:visited, header #header_menu_roll:active {
       text-decoration: none;
       color: initial; }
@@ -59,7 +68,7 @@ header {
     width: 70%;
     padding: 0px;
     display: block;
-    overflow: hidden; }
+    overflow-y: hidden; }
     header ul#header-container h1 {
       margin: 0;
       font-size: 1.5rem; }
@@ -67,6 +76,8 @@ header {
       display: block;
       text-align: center;
       margin: 0; }
+      header ul#header-container li:hover {
+        color: white; }
 
 footer {
   padding: 5px;
@@ -98,13 +109,15 @@ footer {
       body header nav {
         grid-area: nav; }
         body header nav ul#header-container {
+          height: 100%;
           margin: 0;
           width: 100%;
-          height: initial;
           display: grid;
           justify-content: end;
           grid-template-rows: 1fr;
           grid-gap: 4%; }
+          body header nav ul#header-container li {
+            align-self: center; }
           body header nav ul#header-container.logged-in {
             grid-template-columns: auto auto auto;
             grid-template-areas: "maps logged-in-as log-out"; }
@@ -129,9 +142,14 @@ a {
   a.disabled {
     cursor: default; }
 
-main#content {
+#flash-message-container .flash-message {
+  padding: 10px; }
+  #flash-message-container .flash-message.info {
+    background: #4CAF50; }
+
+main#content, #flash-message-container {
   display: block; }
-  main#content.default {
+  main#content.centered, #flash-message-container.centered {
     width: 70%;
     margin: 0 auto;
     padding: 10px; }

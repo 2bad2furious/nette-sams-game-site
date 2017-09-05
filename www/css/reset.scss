@@ -30,18 +30,23 @@ html, body, a {
 html {
   font-size: 100%;
   max-width: 100vw;
+  transition: all 0.15s linear;
+  box-sizing: border-box;
+  font-family: $fonts;
+  line-height: 1.7rem;
+  color: black;
+}
+
+* {
+  box-sizing: inherit;
+  color: inherit;
+  transition: inherit;
+  font-family: inherit;
+  font-size: inherit;
 }
 
 body {
   overflow-y: scroll;
-}
-
-* {
-  transition: all 0.3s linear;
-  box-sizing: border-box;
-  font-family: $fonts;
-  line-height: 1.7rem;
-  vertical-align: middle;
 }
 
 h1 {

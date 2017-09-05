@@ -11,19 +11,28 @@ class AuthPresenter extends BasePresenter {
      * @param BaseForm $form
      */
     public function signUpFormSucceeded(Form $form) {
-        diedump($form);
         $values = $form->getValues(true);
         try {
-            $result = $this->getUserManager()->register($values[UserManagement::USERNAME], $values[UserManagement::EMAIL], $values[UserManagement::PASSWORD_1], UserManager::ROLE_USER, false);
+            $identity = $this->getUserManager()->register($values[UserManagement::USERNAME], $values[UserManagement::EMAIL], $values[UserManagement::PASSWORD_1], UserManager::ROLE_USER, false);
         } catch (Exception $ex) {
-            throw $ex;
-            $result = false;
+            $identity = null;
         }
-        if ($result === true) {
-            $this->flashMessage(UserManagement::SIGN_UP_SUCCESS);
-            $this->redirect(303, "Auth:LogIn");
+        if ($identity instanceof UserIdentity) {
+            //try{
+            $mail = $this->getMailer()->sendRegisterationConfirmationAndVerificationEmail($identity);
+            //}catch(Exception $ex){
+            //$mail = false;
+            //}finally{
+            if ($mail) {
+                $this->flashMessage(UserManagement::SIGN_UP_SUCCESS);
+                $this->getUser()->login($identity);
+                $this->redirect(303, "Profile:default");
+            } else {
+                $this->flashMessage(self::SOMETHING_WENT_WRONG, self::MESSAGE_TYPE_ERROR);
+            }
+            //}
         } else {
-            $this->flashMessage(self::SOMETHING_WENT_WRONG);
+            $this->flashMessage(self::SOMETHING_WENT_WRONG, self::MESSAGE_TYPE_ERROR);
         }
     }
 
@@ -31,43 +40,21 @@ class AuthPresenter extends BasePresenter {
      * @return BaseForm
      */
     public function createComponentSignUpForm() {
-        $form = new Form();
-
-        $form->addText(UserManagement::USERNAME, UserManagement::USERNAME_LABEL)
-            ->setRequired(UserManagement::USERNAME_REQUIRED)
-            ->addRule(Form::MIN_LENGTH, UserManagement::USERNAME_MIN_LENGTH_TEXT, UserManagement::USERNAME_MIN_LENGTH)
-            /*->addRule(function (\Nette\Forms\Controls\TextInput $username) {
-                return $this->getUserManager()->isUsernameOk($username->getValue());
-            }, UserManagement::USERNAME_ALLOWED_CHARS)*/
-            ->addRule(Form::PATTERN, UserManagement::USERNAME_ALLOWED_CHARS, "[0-9a-zA-Z-_+]+")
-            ->addRule(function (\Nette\Forms\Controls\TextInput $username) {
+        return $this->getFormFactory()->createSignUpForm(
+            function (\Nette\Forms\Controls\TextInput $username) {
                 return $this->getUserManager()->isUsernameUnique($username->getValue());
-            }, UserManagement::USERNAME_EXISTS)
-            ->addRule(Form::MAX_LENGTH, UserManagement::USERNAME_MAX_LENGTH_TEXT, UserManagement::USERNAME_MAX_LENGTH);
-
-        $form->addEmail(UserManagement::EMAIL, UserManagement::EMAIL_LABEL)
-            ->setRequired(UserManagement::EMAIL_REQUIRED)
-            ->addRule(function (\Nette\Forms\Controls\TextInput $email) {
+            },
+            function (\Nette\Forms\Controls\TextInput $email) {
                 return $this->getUserManager()->isEmailUnique($email->getValue());
-            }, UserManagement::EMAIL_EXISTS)
-            ->addRule(function (\Nette\Forms\Controls\TextInput $email) {
+            },
+            function (\Nette\Forms\Controls\TextInput $email) {
                 return $this->getUserManager()->isEmailOk($email->getValue());
-            }, UserManagement::EMAIL_MX_ERROR);
-
-        $form->addPassword(UserManagement::PASSWORD_1, UserManagement::PASSWORD_LABEL, null, UserManagement::PASSWORD_MAX_LENGTH)
-            ->setRequired(UserManagement::PASSWORD_REQUIRED)
-            ->addRule(function (\Nette\Forms\Controls\TextInput $password) {
+            },
+            function (\Nette\Forms\Controls\TextInput $password) {
                 return $this->getUserManager()->isPasswordOk($password->getValue());
-            }, UserManagement::PASSWORD_MIN_SECURITY)
-            ->addRule(Form::MIN_LENGTH, UserManagement::PASSWORD_MIN_LENGTH, UserManagement::PASSWORD_MIN_LENGTH);
-
-        $form->addPassword(UserManagement::PASSWORD_2, UserManagement::PASSWORD_VERIFY_LABEL, null, UserManagement::PASSWORD_MAX_LENGTH)
-            ->setRequired(UserManagement::PASSWORD_VERIFY_REQUIRED)
-            ->addRule(Form::EQUAL, UserManagement::PASSWORD_MUST_MATCH, $form[UserManagement::PASSWORD_1]);
-
-        $form->addSubmit("register", UserManagement::SIGN_UP_SUBMIT_LABEL);
-        $form->onSuccess[] = [$this, 'signUpFormSucceeded'];
-        return $form;
+            },
+            [$this, 'signUpFormSucceeded']
+        );
     }
 
     /**
@@ -86,7 +73,7 @@ class AuthPresenter extends BasePresenter {
             $this->flashMessage(UserManagement::LOGIN_SUCCESS);
             $this->redirect(303, "Profile:default");
         } else {
-            $this->flashMessage(self::SOMETHING_WENT_WRONG);
+            $this->flashMessage(self::SOMETHING_WENT_WRONG, self::MESSAGE_TYPE_ERROR);
         }
     }
 
@@ -120,17 +107,10 @@ class AuthPresenter extends BasePresenter {
      * @return BaseForm
      */
     public function createComponentLogInForm() {
-        $form = new Form($this->getTranslator());
-        $form->addText(UserManagement::USERNAME, UserManagement::USERNAME_LABEL, null, UserManagement::USERNAME_MAX_LENGTH)
-            ->setRequired(UserManagement::USERNAME_REQUIRED);
-        $form->addPassword(UserManagement::PASSWORD, UserManagement::PASSWORD_LABEL, null, 255)
-            ->setRequired(UserManagement::PASSWORD_REQUIRED);
-        $form->addSubmit("login", UserManagement::LOGIN_SUBMIT_LABEL);
-        //checkExistsAndCorrectValues
-        $form->onValidate[] = [$this, "logInFormValidate"];
-        //login
-        $form->onSuccess[] = [$this, "logInFormSucceeded"];
-        return $form;
+        return $this->getFormFactory()->createLogInForm(
+            [$this, "logInFormValidate"],
+            [$this, "logInFormSucceeded"]
+        );
     }
 
     /**

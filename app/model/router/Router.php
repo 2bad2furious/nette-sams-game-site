@@ -37,7 +37,7 @@ class Router {
             $types = implode("|", CheckAvailabilityPresenter::AVAILABILITY_TYPES);
 
             //BOTH
-            $routes[] = new Route($both . "<presenter map>[/<id=0 [0-9]+>]", [
+            $routes[] = new Route($both . "<presenter map>[<author [" . UserManager::USERNAME_CHARSET . "]+>[/<id [0-9]+ >]]", [
                 "action" => "show",
             ]);
             $routes[] = new Route($both . "<presenter auth>/<action sign-up|log-in>");
@@ -45,15 +45,15 @@ class Router {
             $routes[] = new Route($api . "<presenter check-availability>/<{$type} {$types}>");
             $routes[] = new Route($api . "<presenter log>[/<action=default default>]");
             //HTML
-            $charset = TokenManager::CHARSET;
-
             $routes[] = new Route($html . "<presenter profile>[/<action=default default|edit-username|sign-out|resend>]");
-            $routes[] = new Route($html . "<presenter profile>/<action verify>/<token [{$charset}]+>");
+            $routes[] = new Route($html . "<presenter profile>/<action verify>");
             $routes[] = new Route($html . "<presenter map>/<action add|edit|delete|manage>");
-
+            $routes[] = new Route($html . "<presenter token>/<token-action " . implode("|", TokenManager::ACTIONS) . ">/<token [" . TokenManager::CHARSET . "]{" . TokenManager::TOKEN_STRING_LENGTH . "}>", [
+                "action" => "default",
+            ]);
             $routes[] = new Route($html . "<presenter notes>[/<action=default default>]");
             $routes[] = new Route($html . "<presenter header>[/<action=default default>]");
-            $routes[] = new Route($html . "[<presenter=HomePage HomePage>/][<action=default default>]");
+            $routes[] = new Route($html . "[<presenter=HomePage HomePage>][/<action=default default>]");
         }
         return $routes;
     }

@@ -5,6 +5,10 @@ use BaseForm as Form;
 
 class ProfilePresenter extends BasePresenter {
 
+    public function renderVerify() {
+
+    }
+
     /**
      * signs out current user, doesnt care whether hes logged in
      * @return void;
@@ -12,18 +16,21 @@ class ProfilePresenter extends BasePresenter {
     public function actionSignOut(): void {
         $loggedOut = $this->logOut();
         $message = self::SOMETHING_WENT_WRONG;
+        $type = self::MESSAGE_TYPE_ERROR;
         if (is_bool($loggedOut)) {
-            if ($loggedOut)
+            if ($loggedOut) {
                 $message = UserManagement::SIGN_OUT_SUCCESS;
-            else
+                $type = self::MESSAGE_TYPE_INFO;
+            } else {
                 $message = UserManagement::LOGIN_TO_SIGN_OUT;
+                $type = self::MESSAGE_TYPE_WARNING;
+            }
         }
-        $this->flashMessage($message);
+        $this->flashMessage($message, $type);
         $this->redirect(303, "Auth:logIn");
     }
 
-    public
-    function actionDefault() {
+    public function actionDefault() {
         $this->setIdentity($this->getUser()->getIdentity());
     }
 
@@ -64,11 +71,11 @@ class ProfilePresenter extends BasePresenter {
         if ($change) {
             $logout = $this->logOut();
             if ($logout) {
-                $this->flashMessage(UserManagement::USER_LOGGED_OUT_TO_CHANGE);
+                $this->flashMessage(UserManagement::USER_LOGGED_OUT_TO_CHANGE, self::MESSAGE_TYPE_INFO);
                 $this->redirect(303, "User:logIn");
             }
         }
-        $this->flashMessage(self::SOMETHING_WENT_WRONG);
+        $this->flashMessage(self::SOMETHING_WENT_WRONG, self::MESSAGE_TYPE_ERROR);
     }
 
     /**
@@ -76,18 +83,17 @@ class ProfilePresenter extends BasePresenter {
      * @return array
      */
     protected function getRoles(): array {
-        if ($this->getAction() === "verify") {
+        if (in_array($this->getAction(), ["verify", "resend"])) {
             return [UserManager::ROLE_USER];
         }
-        return [UserManager::ROLE_USER, UserManager::ROLE_VERIFIED_USER];
+        return UserManager::USERS;
     }
-
-    public function actionVerify() {
-        diedump($this);
-    }
-
 
     public function createComponentProfile($name) {
         return new ProfileControl($this, $name);
+    }
+
+    public function renderResend() {
+        $this->template->message = $this->getTranslator()->translate("");
     }
 }

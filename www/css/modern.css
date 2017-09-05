@@ -1,3 +1,52 @@
 /* use this instead of display:grid because of Edge - thank you, Microsoft*/
+@supports (grid-area: auto) {
+  body {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: min-content min-content 1fr min-content;
+    grid-template-areas: "header" "messages" "content" "footer";
+    min-height: 100vh; }
+    body header {
+      grid-area: header;
+      display: grid;
+      grid-template-columns: min-content 1fr;
+      grid-template-rows: 1fr;
+      grid-template-areas: "logo nav";
+      /* a bit too complicated but cleaner */ }
+      body header #go-home {
+        float: none;
+        grid-area: logo; }
+      body header #header_menu_roll {
+        display: none; }
+      body header nav {
+        grid-area: nav; }
+        body header nav ul#header-container {
+          height: 100%;
+          margin: 0;
+          width: 100%;
+          display: grid;
+          justify-content: end;
+          grid-template-rows: 1fr;
+          grid-gap: 4%; }
+          body header nav ul#header-container li {
+            align-self: center; }
+          body header nav ul#header-container.logged-in {
+            grid-template-columns: auto auto auto;
+            grid-template-areas: "maps logged-in-as log-out"; }
+            body header nav ul#header-container.logged-in li#manage-your-maps {
+              grid-area: maps; }
+            body header nav ul#header-container.logged-in li#logged-in-as {
+              grid-area: logged-in-as; }
+            body header nav ul#header-container.logged-in li#log-out {
+              grid-area: log-out; }
+          body header nav ul#header-container.logged-out {
+            grid-template-columns: auto auto;
+            grid-template-areas: "log-in sign-up"; }
+            body header nav ul#header-container.logged-out li#sign-up {
+              grid-area: sign-up; }
+            body header nav ul#header-container.logged-out li#log-in {
+              grid-area: log-in; }
+      body header.alone ul {
+        display: block; } }
 
 /*# sourceMappingURL=modern.css.map */

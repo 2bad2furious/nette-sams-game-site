@@ -18,19 +18,16 @@
     <script src="/ext/nette.ajax.js" type="application/javascript"></script>
     <script src="/js/functions.js" type="application/javascript"></script>
     <script src="/js/js.js" type="application/javascript"></script>
-    <noscript>
-        <link href="/css/noscript.css" rel="stylesheet" type="text/css">
-    </noscript>
 </head>
 <body>
 {default $isAlone = false}
 {control header $isAlone}
-<div id="flash-message-container">
+<div id="flash-message-container" class="centered">
     {foreach $flashes as $flash}
         <div class="flash-message {$flash->type}">{_}{$flash->message}{/_}.</div>
     {/foreach}
 </div>
-<main id="content" class="default">
+<main id="content" class="centered">
     {include content}
     TODO ref pro login a register<br>
     TODO mailqueue<br>

@@ -17,9 +17,13 @@ class English extends Language {
             /* Forms -start*/
             //nette
             "Please enter a valid email address." => "Please enter a valid email address",
-            "This field is required." => "This field is required",
+            "This field is required."             => "This field is required",
 
             //global
+            "go_home"                             => "Go home",
+            "site_navigation"                     => "Site navigation",
+            "manage_your_maps"                    => "Manage your maps",
+            "account_verification_resend"         => "Account verification resend",
             BasePresenter::SOMETHING_WENT_WRONG   => "Something went wrong",
 
             UserManagement::PASSWORD_LABEL           => "Password",
@@ -32,7 +36,7 @@ class English extends Language {
             UserManagement::EMAIL_LABEL              => "Email",
             UserManagement::EMAIL_REQUIRED           => "You must enter your email",
             UserManagement::EMAIL_EXISTS             => "User with this email already exists",
-            UserManagement::USERNAME_EXISTS          => "User with this username already exists xd",
+            UserManagement::USERNAME_EXISTS          => "User with this username already exists",
             UserManagement::USERNAME_MAX_LENGTH_TEXT => "Username can be only %d characters long",
             UserManagement::USERNAME_MIN_LENGTH_TEXT => "Username must be at least %d characters long",
 
@@ -44,7 +48,7 @@ class English extends Language {
 
             //login_form
             UserManagement::LOGIN_SUBMIT_LABEL                  => "Log in",
-            UserManagement::USERNAME_NOT_EXIST                  => "User with this username does not exist",
+            UserManagement::USERNAME_NOT_EXIST_NEGATIVE         => "User with this username does not exist",
             UserManagement::PASSWORD_AUTH_ERROR                 => "Wrong password, pal",
             UserManagement::USER_ALREADY_LOGGED_IN              => "You are already logged in",
             UserManagement::LOGIN_SUCCESS                       => "You are now logged in",
@@ -75,6 +79,8 @@ class English extends Language {
             UserManagement::ACTION_FOR_VERIFIED_ONLY_ADDITIONAL => "You should have the verification email in your inbox. If not, you can resend it <a href='%s'>here</a>",
             UserManagement::ACTION_FOR_USERS_ONLY               => "This action requires you to be logged in",
             UserManagement::ACTION_FOR_USERS_ONLY_ADDITIONAL    => "You should <a href='%2\$s'>Sign Up</a> and/or <a href='%1\$s'>Log in</a>",
+            UserManagement::REGISTER_EMAIL_MESSAGE              => "You can verify your account by going to this link <a href='%1\$s'>%1\$s</a>. You can also do it at this link %3\$s by entering the code there. Here is your code: %2\$s",
+            UserManagement::REGISTER_EMAIL_TITLE                => "Welcome to our gamesite.",
         ];
     }
 }

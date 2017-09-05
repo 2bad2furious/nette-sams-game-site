@@ -5,7 +5,7 @@
 serverlog = function (data) {
     console.info(data);
     $.post("/api/log", {
-            "data": data
+            "data": Json.stringify(data)
         },
         function (r) {
             console.log(r.success);
